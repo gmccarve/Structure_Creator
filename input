@@ -1,0 +1,48 @@
+%core test
+addcore CORE_FILE
+add_con_atom 0 1 2
+add_max_dent 8
+end
+
+%core Gd
+end
+
+%core Lu
+end
+
+%ligand 0 acac
+ligocc 1
+symmetric 1 2
+nonsymmetric 11
+end
+
+%ligand 0 no3
+ligocc 2
+end
+
+%ligand 1 acac
+ligocc 2
+end
+
+%ligand 1 no3
+ligocc 1
+end
+
+%extra
+geometry oct
+keephs yes
+coord 6
+spin 1
+distort 0
+replig true
+keepHs true
+ligalign true
+end
+
+%mod
+f
+cl
+br
+methyl
+ethyl
+end
