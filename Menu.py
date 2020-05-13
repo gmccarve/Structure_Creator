@@ -1,18 +1,14 @@
 import os
 import sys
-import re
-import itertools
 
 from Ligand import LIGAND
 from Core import CORE
 from Mod import MOD
+from Extra import EXTRAdef clear():
 from Comp import COMP
 
 
 def MENU():
-
-    def clear():
-        os.system('clear')
 
     def No_Inp(x):
         while x == '':
@@ -27,13 +23,6 @@ def MENU():
         return x
 
 
-    clear()
-
-    print (" Welcome to the Structure Creator Code V 3.0")
-    print (" This code is able to create modified structures")
-    print (" that can be used for quantum chemical calculations")
-    print ("\n What would you like to do:")
-
     END = False
 
     core_dict   = {}
@@ -42,6 +31,8 @@ def MENU():
     extra_dict  = {}
 
     while END != True:
+
+        print ("\n What would you like to do?")
 
         print ("\n\n 1 - Define core(s) \
                   \n 2 - Define ligand(s)\

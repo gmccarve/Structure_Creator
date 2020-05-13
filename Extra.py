@@ -3,15 +3,7 @@ import sys
 import re
 from collections import defaultdict
 
-""" 
-
-    To fix:
-
-    -Add xyz file for modification (ligand)
-
-"""
-
-def MOD(mod_dict):
+def EXTRA(extra_dict):
 
     def clear():
         os.system('clear')
@@ -211,9 +203,8 @@ def MOD(mod_dict):
 
 if __name__ == "__main__":
 
-    mod_dict = {'Modifications': ['f', 'cl'], 'Number of Substitutions': ['1']}
-    #MOD(mod_dict)
-    print (MOD(mod_dict))
+    extra_dict = {'geometry': 'oct'}
+    print (EXTRA(extra_dict))
 
 
 
