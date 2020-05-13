@@ -2,7 +2,7 @@ import os
 import sys
 
 
-def FILE_INPUT():
+def FILE_INPUT(input_file):
 
     def Find_Molsim():
         for root, dir, files in os.walk(os.path.expanduser('~')):
@@ -20,7 +20,7 @@ def FILE_INPUT():
     molsim = Find_Molsim()
 
 
-    with open(str(sys.argv[2])) as f:
+    with open(input_file) as f:
         ff = f.readlines()
 
     count = 0
@@ -306,7 +306,7 @@ def FILE_INPUT():
 
     if choice.lower() == 'compile':
         return ligand_dict, core_dict, mod_dict, extra_dict
-        #COMP(ligand_dict, core_dict, mod_dict, extra_dict)
+        COMP(ligand_dict, core_dict, mod_dict, extra_dict)
 
     elif choice.lower() == 'print':
 
@@ -334,6 +334,8 @@ def FILE_INPUT():
         for k, v in extra_dict.items():
             print (k, v)
         print ()
+
+    return
 
 
 if __name__ == "__main__":

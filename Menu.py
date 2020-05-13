@@ -4,7 +4,7 @@ import sys
 from Ligand import LIGAND
 from Core import CORE
 from Mod import MOD
-from Extra import EXTRAdef clear():
+from Extra import EXTRA
 from Comp import COMP
 
 
@@ -69,10 +69,10 @@ def MENU():
                     mod_dict = MOD(mod_dict)
 
                 elif choice_ == 'compile':
-                    COMP(ligand_dict, core_dict, mod_dict)
+                    COMP(ligand_dict, core_dict, mod_dict, extra_dict)
 
             else:
-                COMP(ligand_dict, core_dict, mod_dict)
+                COMP(ligand_dict, core_dict, mod_dict, extra_dict)
 
         elif choice == '6':
             print ("________________________")
@@ -93,6 +93,13 @@ def MENU():
             print ("Modifications:\n")
             for k, v in mod_dict.items():
                 print (k, v)
+
+            print ("________________________")
+            print ("Molsimplify Extras:\n")
+            for k, v in extra_dict.items():
+                print (k, v)
+            print ()
+
 
         elif choice == '7':
             sys.exit()
