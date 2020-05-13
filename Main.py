@@ -20,12 +20,12 @@ from Menu import MENU
 def clear():
     os.system('clear')
 
-def No_Inp(x):
+def Input():
+
+    x = input(" > ").lower()
+
     while x == '':
         x = str(input("\033[A > ")).lower()
-    return x
-
-def Trim(x):
     while x.endswith(" ") == True:
         x = x[:-1]
     while x.startswith(" ") == True:
@@ -53,9 +53,7 @@ if __name__ == "__main__":
     _ = False
 
     while _ != True:
-        choice = input("\n > ").lower()
-        choice = No_Inp(choice)
-        choice = Trim(choice)
+        choice = Input()
     
         if choice == 'menu':
             MENU()

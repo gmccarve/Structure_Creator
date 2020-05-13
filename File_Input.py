@@ -13,7 +13,7 @@ def FILE_INPUT(input_file):
     core_dict   = {}
     ligand_dict = {}
     mod_dict    = {}
-    extra_dict  = {}
+    param_dict  = {}
 
     runcheck = False
 
@@ -289,12 +289,12 @@ def FILE_INPUT(input_file):
                     print ("\n\nLigand added successfully. Use at your own risk")
 
 
-            elif item == 'extra':
+            elif item == 'param':
                 count = 1
 
                 while ff[j+count].startswith('end') == False:
                     temp = ff[j+count].split(" ")
-                    extra_dict[temp[0]] = str(temp[1])[:-1]
+                    param_dict[temp[0]] = str(temp[1])[:-1]
 
                     count += 1
 
@@ -305,8 +305,8 @@ def FILE_INPUT(input_file):
     choice = input(" > ")
 
     if choice.lower() == 'compile':
-        return ligand_dict, core_dict, mod_dict, extra_dict
-        COMP(ligand_dict, core_dict, mod_dict, extra_dict)
+        return ligand_dict, core_dict, mod_dict, param_dict
+        COMP(ligand_dict, core_dict, mod_dict, param_dict)
 
     elif choice.lower() == 'print':
 
@@ -330,8 +330,8 @@ def FILE_INPUT(input_file):
             print (k, v)
 
         print ("________________________")
-        print ("Molsimplify Extras:\n")
-        for k, v in extra_dict.items():
+        print ("Molsimplify Parameters:\n")
+        for k, v in param_dict.items():
             print (k, v)
         print ()
 
@@ -342,7 +342,7 @@ if __name__ == "__main__":
 
     if len(sys.argv[1:]) > 0:
         if sys.argv[1] == '-f':
-            FILE_INPUT()
+            FILE_INPUT(sys.argv[2])
 
         else:
             print ("Must supply an appropriate input file preceded by '-f'")

@@ -3,7 +3,7 @@ import sys
 from LigMod import LIGMOD
 
 
-def COMP(ligand_dict, core_dict, mod_dict, extra_dict):
+def COMP(ligand_dict, core_dict, mod_dict, param_dict):
 
     def No_Inp(x):
         while x == '':

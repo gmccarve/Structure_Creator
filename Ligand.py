@@ -1,13 +1,25 @@
 import os
 
+""" 
+
+    To Do:
+
+    1 - add ability to remove ligand from ligand environemnt
+    2 - add ability for multiples of the same ligand in an environment
+        {1:[{acac1}, {acac2}, ...]}
+    3 - add ability for multiple symmetric lists [[], []]
+
+
+"""
+
 def LIGAND(ligand_dict):
 
-    def No_Inp(x):
+    def Input():
+
+        x = input(" > ").lower()
+
         while x == '':
             x = str(input("\033[A > ")).lower()
-        return x
-
-    def Trim(x):
         while x.endswith(" ") == True:
             x = x[:-1]
         while x.startswith(" ") == True:
@@ -37,12 +49,11 @@ def LIGAND(ligand_dict):
 
     def ADD(ligand_dict, ligand):
         print ("\n\n Which atoms (if any) would you like to modify for this ligand?")
-        ligand_mod = input(" Type 'all' to modify all hydrogens, \
+        print (" Type 'all' to modify all hydrogens, \
                         \n      'none' to modify no hydrogens, or\
-                        \n      'manual' to add hydrogens by index\n\n > ").lower()
+                        \n      'manual' to add hydrogens by index\n\n")
 
-        ligand_mod = No_Inp(ligand_mod)
-        ligand_mod = Trim(ligand_mod)
+        ligand_mod = Input()
 
         if ligand_mod == 'all':
 
@@ -73,10 +84,9 @@ def LIGAND(ligand_dict):
             return
 
         elif ligand_mod == 'manual':
-            symmetric_hs = input("\n Type the indices of any symmetric hydrogens or 'skip' to skip\n\n > ").lower()
+            print ("\n Type the indices of any symmetric hydrogens or 'skip' to skip\n\n")
             
-            symmetric_hs = No_Inp(symmetric_hs)
-            symmetric_hs = Trim(symmetric_hs)
+            symmetric_hs = Input()
 
             if symmetric_hs != 'skip':
 
@@ -88,10 +98,9 @@ def LIGAND(ligand_dict):
                 ligand_dict[envir][ligand]['Symmetric Hs'] = symmetric_hs
 
 
-            nonsymmetric_hs = input("\n Type the indices of any non-symmetric hydrogens or 'skip' to skip\n\n > ").lower()
+            print ("\n Type the indices of any non-symmetric hydrogens or 'skip' to skip\n\n")
 
-            nonsymmetric_hs = No_Inp(nonsymmetric_hs)
-            nonsymmetric_hs = Trim(nonsymmetric_hs)
+            nonsymmetric_hs = Input()
 
             if nonsymmetric_hs != 'skip':
 
@@ -119,9 +128,7 @@ def LIGAND(ligand_dict):
         print ("\n Which environment would you like to add this ligand to?")
         print ("\n Or type 'new' to add a new environment\n")
 
-        envir = str(input(" > ")).lower()
-        envir = No_Inp(envir)
-        envir = Trim(envir)
+        envir = Input()
 
         return envir
 
@@ -134,17 +141,15 @@ def LIGAND(ligand_dict):
 
     while choice != 'end':
 
-        print("\n What would you like to do?")
-        choice = str(input(" \
-                \n 1 - Add/modify ligand environment\
+        print ("\n What would you like to do?")
+        print ("\n 1 - Add/modify ligand environment\
                 \n 2 - Show list of added ligands\
                 \n 3 - Show data from ligand file\
                 \n 4 - Show available ligands\
                 \n 5 - Remove a ligand environment\
-                \n 6 - Go Back \n\n > ")).lower()
+                \n 6 - Go Back \n\n")
 
-        choice = No_Inp(choice)
-        choice = Trim(choice)
+        choice = Input()
 
         if choice == '1':
 
@@ -186,16 +191,12 @@ def LIGAND(ligand_dict):
 
 
             print ("\n Which ligand would you like to add? \n")
-            ligand = str(input(" > ")).lower()
 
-            ligand = No_Inp(ligand)
-            ligand = Trim(ligand)
+            ligand = Input()
             
             print ("\n How many of this ligand would you like to add? \n")
-            num_lig = str(input(" > ")).lower()
-
-            num_lig = No_Inp(num_lig)
-            num_lig = Trim(num_lig)
+            
+            num_lig = Input()
             
             temp = check_ligand(ligand, ligand_file)
 
@@ -216,17 +217,15 @@ def LIGAND(ligand_dict):
                         \n Would you like to supply a .mol or .xyz file for this ligand (y/n)? \n\n > ").lower()
 
                 if y_n == 'y':
-                    ligand_location = input("\n Enter location of file \n\n > ")
+                    print ("\n Enter location of file \n\n")
 
-                    ligand_location = No_Inp(ligand_location)
-                    ligand_location = Trim(ligand_location)
+                    ligand_location = Input
 
                     add_ligand_file = ligand_location.split("/")[-1]
 
-                    con_atom = str("[" + input("\n Enter connection atom(s) index separated by commas\n\n > ").lower() + "]")
+                    print ("\n Enter connection atom(s) index separated by commas\n\n")
 
-                    con_atom = No_Inp(con_atom)
-                    con_atom = Trim(con_atom)
+                    con_atom = str("[" + Input() + "]")
 
                     try:
                 
@@ -262,10 +261,8 @@ def LIGAND(ligand_dict):
                 print (" 1 - Display the ligand file\
                       \n 2 - Choose which atoms to modify\
                       \n 3 - Skip")
-                show_mod = input(" \n > ")
-
-                show_mod = No_Inp(show_mod)
-                show_mod = Trim(show_mod)
+                
+                show_mod = Input()
 
 
                 if show_mod == '1':
@@ -313,12 +310,9 @@ def LIGAND(ligand_dict):
                         print ()
 
 
-                print ("\n Which ligand would you like to display?")
+                print ("\n Which ligand would you like to display?\n")
 
-                ligand = input("\n\n > ").lower()
-
-                ligand = No_Inp(ligand)
-                ligand = Trim(ligand)
+                ligand = Input()
 
                 temp = check_ligand(ligand, ligand_file)
 
@@ -360,10 +354,17 @@ def LIGAND(ligand_dict):
                         print (" ", kk, " - ", vv)
                         print ()
 
-                lig_rem = input ("\n\n Which ligand environment would you like to remove?\n\n > ")
+                print ("\n\n Which ligand environment would you like to remove?\n\n")
 
-                lig_rem = No_Inp(lig_rem)
-                lig_rem = int(Trim(lig_rem))
+                lig_rem = Input()
+
+                try:
+                
+                    lig_rem = int(lig_rem)
+
+                except:
+
+                    print ("\n\n Invalid entry")
 
                 if lig_rem not in ligand_dict:
                     print ("\n\n Ligand environment not found in list of given ligands")

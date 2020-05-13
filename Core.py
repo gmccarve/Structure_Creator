@@ -2,12 +2,11 @@ import os
 
 def CORE(core_dict):
 
-    def No_Inp(x):
+    def Input():
+
+        x = input(" > ").lower()
         while x == '':
             x = str(input("\033[A > ")).lower()
-        return x
-
-    def Trim(x):
         while x.endswith(" ") == True:
             x = x[:-1]
         while x.startswith(" ") == True:
@@ -41,8 +40,7 @@ def CORE(core_dict):
                         \n      'none' to modify no hydrogens, or\
                         \n      'manual' to add hydrogens by index\n\n > ").lower()
 
-        core_mod = No_Inp(core_mod)
-        core_mod = Trim(core_mod)
+        core_mod = Input()
 
         if core_mod == 'all':
 
@@ -70,11 +68,10 @@ def CORE(core_dict):
             return
 
         elif core_mod == 'manual':
-            symmetric_hs = input("\n Type the indices of any symmetric hydrogens or 'skip' to skip\n\n > ").lower()
+            print ("\n Type the indices of any symmetric hydrogens or 'skip' to skip\n\n")
             
-            symmetric_hs = No_Inp(symmetric_hs)
-            symmetric_hs = Trim(symmetric_hs)
-
+            symmetric_hs = Input()
+            
             if symmetric_hs != 'skip':
 
                 symmetric_hs = symmetric_hs.split(" ")
@@ -85,10 +82,9 @@ def CORE(core_dict):
                 core_dict[core]['Symmetric Hs'] = symmetric_hs
 
 
-            nonsymmetric_hs = input("\n Type the indices of any non-symmetric hydrogens or 'skip' to skip\n\n > ").lower()
+            print ("\n Type the indices of any non-symmetric hydrogens or 'skip' to skip\n\n")
 
-            nonsymmetric_hs = No_Inp(nonsymmetric_hs)
-            nonsymmetric_hs = Trim(nonsymmetric_hs)
+            nonsymmetric_hs = Input()
 
             if nonsymmetric_hs != 'skip':
 
@@ -109,24 +105,20 @@ def CORE(core_dict):
     while choice != 'end':
 
         print("\n What would you like to do?")
-        choice = str(input(" \
-                \n 1 - Add core\
+        print ("\n 1 - Add core\
                 \n 2 - Show list of added cores\
                 \n 3 - Show data from core file\
                 \n 4 - Show available cores\
                 \n 5 - Remove a core\
-                \n 6 - Go Back \n\n > ")).lower()
+                \n 6 - Go Back \n\n")
 
-        choice = No_Inp(choice)
-        choice = Trim(choice)
+        choice = Input()
 
         if choice == '1':
 
             print ("\n Which core would you like to add? \n")
-            core = str(input(" > ")).lower()
-
-            core = No_Inp(core)
-            core = Trim(core)
+            
+            core = Input()
             
             temp = check_core(core, core_file)
 
@@ -137,26 +129,25 @@ def CORE(core_dict):
                 END = core_location[-4:]
 
             else:
-                y_n = input("\n Core not found. \
-                        \n Would you like to supply a .mol or .xyz file for this core (y/n)? \n\n > ").lower()
+                print ("\n Core not found. \
+                        \n Would you like to supply a .mol or .xyz file for this core (y/n)? \n\n")
+                
+                y_n = Input()
 
                 if y_n == 'y':
-                    core_location = input("\n Enter location of file \n\n > ")
+                    print ("\n Enter location of file \n\n > ")
 
-                    core_location = No_Inp(core_location)
-                    core_location = Trim(core_location)
+                    core_location = Input()
 
                     add_core_file = core_location.split("/")[-1]
 
-                    con_atom = str("[" + input("\n Enter connection atom(s) index separated by commas\n\n > ").lower() + "]")
+                    print ("\n Enter connection atom(s) index separated by commas\n\n")
 
-                    con_atom = No_Inp(con_atom)
-                    con_atom = Trim(con_atom)
+                    con_atom = str("[" + Input() + "]")
 
-                    max_den = input(" Enter maximum denticity \n\n").lower()
+                    print (" Enter maximum denticity \n\n")
 
-                    max_den = no_Inp(max_den)
-                    max_den = Trim(max_den)
+                    max_den = Input()
                 
                     os.system("cp " + core_location + " " + MolSim + "Cores/" + add_core_file)
 
@@ -183,10 +174,8 @@ def CORE(core_dict):
                 print (" 1 - Display the core file\
                       \n 2 - Choose which atoms to modify\
                       \n 3 - Skip")
-                show_mod = input(" \n > ")
 
-                show_mod = No_Inp(show_mod)
-                show_mod = Trim(show_mod)
+                show_mod = Input()
 
 
                 if show_mod == '1':
@@ -224,14 +213,11 @@ def CORE(core_dict):
         elif choice == '3':
             if core_dict != {}:
 
-                print ("\n Which core would you like to display?")
+                print ("\n Which core would you like to display?\n")
                 for k, v, in core_dict.items():
                     print ("  - " + str(k))
 
-                core = input("\n\n > ").lower()
-
-                core = No_Inp(core)
-                core = Trim(core)
+                core = Input()
 
                 temp = check_core(core, core_file)
 
@@ -258,6 +244,7 @@ def CORE(core_dict):
                 print ("\n No cores added yet")
 
         elif choice == '4':
+            print ()
             with open(MolSim + "Cores/cores.dict") as f:
                 for line in f:
                     print (str(line)[:-1])
@@ -265,14 +252,13 @@ def CORE(core_dict):
         elif choice == '5':
             if core_dict != {}:
 
-                print (" Current list of cores")
+                print ("\n Current list of cores\n")
                 for k, v, in core_dict.items():
                     print ("  - " + str(k))
 
-                core_rem = input ("\n\n Which core would you like to remove?\n\n >")
+                print ("\n\n Which core would you like to remove?\n\n")
 
-                core_rem = No_Inp(core_rem)
-                core_rem = Trim(core_rem)
+                core_rem = Input()
 
                 if core_rem not in core_dict:
                     print ("\n\n Core not found in list of given Cores")

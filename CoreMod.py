@@ -10,13 +10,12 @@ from collections import Counter
     To Do:
     
     1 - add mutliple, symmetric sets as [[], []...]
-    2 - incorporate param_dict
 
 
 """
 
 
-def LIGMOD(core, ligand_dict, mod_dict, param_dict):
+def COREMOD(core, core_mod, ligand_dict, mod_dict, param_dict):
 
     structure_count = 0
 
@@ -203,4 +202,4 @@ if __name__ == "__main__":
     mod_dict    = {'Modifications': ['f', 'cl', 'br'], 'Number of Substitutions': ['1']}
 
 
-    LIGMOD(core, ligand_dict, mod_dict)
+    COREMOD(core, core_mod, ligand_dict, mod_dict, param_dict)

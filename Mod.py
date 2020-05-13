@@ -16,12 +16,12 @@ def MOD(mod_dict):
     def clear():
         os.system('clear')
 
-    def No_Inp(x):
+    def Input():
+
+        x = input(" > ").lower()
+
         while x == '':
             x = str(input("\033[A > ")).lower()
-        return x
-
-    def Trim(x):
         while x.endswith(" ") == True:
             x = x[:-1]
         while x.startswith(" ") == True:
@@ -46,49 +46,41 @@ def MOD(mod_dict):
 
     while choice != 'end':
 
-        print("\n What would you like to do?")
-        choice = str(input(" \
-                \n 1 - Add modification\
-                \n 2 - Show list of added modifications\
-                \n 3 - Choose how many modifications to perform\
-                \n 4 - Remove a modification\
-                \n 5 - Go Back \n\n > ")).lower()
+        print("\n What would you like to do?\
+               \n\n 1 - Add modification\
+                 \n 2 - Show list of added modifications\
+                 \n 3 - Choose how many modifications to perform\
+                 \n 4 - Remove a modification\
+                 \n 5 - Go Back \n\n")
 
-        choice = No_Inp(choice)
-        choice = Trim(choice)
+        choice = Input()
 
         if choice == '1':
 
             print ("\n Which modification would you like to add? \n")
 
-            mod = str(input(" > ")).lower()
-            mod = No_Inp(mod)
-            mod = Trim(mod)
+            mod = Input()
 
             print ("\n Does this modification need to be added to the system (y/n)? \n")
 
-            add_mod = str(input(" > ")).lower()
-            add_mod = No_Inp(add_mod)
-            add_mod = Trim(add_mod)
+            add_mod = Input()
 
             if add_mod == 'y':
 
-                mod_loc = input("\n Enter location of file \n\n > ")
-                mod_loc = No_Inp(mod_loc)
-                mod_loc = Trim(mod_loc)
+                print ("\n Enter location of file\n")
+                
+                mod_loc = Input()
 
                 mod_xyz = mod_loc.split("/")[-1].lower()
 
-                con_atom = str(input("\n Enter connection atom index/[indeces] \n\n > ").lower())
-                con_atom = No_Inp(con_atom)
-                con_atom = Trim(con_atom)
+                print ("\n Enter connection atom index/[indeces] \n\n")
+                
+                con_atom = Input()
 
                 try:
 
                     os.system("molsimplify -ligadd " + mod_loc + " -ligname " + mod + " -ligcon " + con_atom )
                     os.system("cp " + mod_loc + " " + molsim + "Ligands/" + mox_xyz)
-
-                    print ("cp " + mod_loc + " " + molsim + "Ligands/" + mox_xyz)
 
                     print ("\n\n Modification added but use at your own risk")
 
@@ -118,11 +110,9 @@ def MOD(mod_dict):
             if sub_list == []:
 
                 print ("\n How many modifications would you like to make?")
-                print (" For multiple modifications, separate values by spaces")
+                print (" For multiple modifications, separate values by spaces\n")
                 
-                sub = input("\n > ")
-                sub = No_Inp(sub)
-                sub = Trim(sub)
+                sub = Input()
 
                 temp = []
                 
@@ -138,11 +128,9 @@ def MOD(mod_dict):
 
 
             else:
-                print ("\n\n 1 - To view number of modifications already given\n 2 - To change the number of modifications")
+                print ("\n 1 - To view number of modifications already given\n 2 - To change the number of modifications\n")
 
-                choice_ = input("\n > ")
-                choice_ = No_Inp(choice_)
-                choice_ = Trim(choice_)
+                choice_ = Input()
 
                 if choice_ == '1':
                     print ("\n\n Number of modifications - ", end='' )
@@ -158,9 +146,7 @@ def MOD(mod_dict):
                     print ("\n How many modifications would you like to make?")
                     print (" For multiple modifications, separate values by spaces")
                     
-                    sub = input("\n > ")
-                    sub = No_Inp(sub)
-                    sub = Trim(sub)
+                    sub = Input()
 
                     try:
                         for j in sub.split(" "):
@@ -183,11 +169,9 @@ def MOD(mod_dict):
                 for j in mod_list:
                     print (" - " + str(j))
 
-                mod_rem = input ("\n\n Which modification would you like to remove?\n\n > ")
-                mod_rem = No_Inp(mod_rem)
-                mod_rem = Trim(mod_rem)
-
-                print (mod_rem)
+                print ("\n\n Which modification would you like to remove?\n\n")
+                
+                mod_rem = Input()
 
                 if mod_rem not in mod_list:
                     print ("\n\n Modification not found in list of given modifications")

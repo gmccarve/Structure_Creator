@@ -4,18 +4,18 @@ import sys
 from Ligand import LIGAND
 from Core import CORE
 from Mod import MOD
-from Extra import EXTRA
+from Parameters import PARAM
 from Comp import COMP
 
 
 def MENU():
 
-    def No_Inp(x):
+    def Input():
+
+        x = input(" > ").lower()
+
         while x == '':
             x = str(input("\033[A > ")).lower()
-        return x
-
-    def Trim(x):
         while x.endswith(" ") == True:
             x = x[:-1]
         while x.startswith(" ") == True:
@@ -28,7 +28,7 @@ def MENU():
     core_dict   = {}
     ligand_dict = {}
     mod_dict    = {}
-    extra_dict  = {}
+    param_dict  = {}
 
     while END != True:
 
@@ -37,14 +37,12 @@ def MENU():
         print ("\n\n 1 - Define core(s) \
                   \n 2 - Define ligand(s)\
                   \n 3 - Define modification(s)\
-                  \n 4 - Define molsimplify extras\
+                  \n 4 - Define molsimplify parameters\
                   \n 5 - Compile structures\
                   \n 6 - Print information\
                   \n 7 - Exit")
 
-        choice = input("\n\n > ").lower()
-        choice = No_Inp(choice)
-        choice = Trim(choice)
+        choice = Input()
 
 
         if choice == '1':
@@ -57,22 +55,23 @@ def MENU():
             mod_dict = MOD(mod_dict)
 
         elif choice == '4':
-            extra_dict = EXTRA(extra_dict)
+            param_dict = PARAM(param_dict)
 
         elif choice == '5':
             if mod_dict == {}:
                 print ("\n\nNo modifications added. Structures can still be compiled, however.")
                 print ("Would you like to [add] modifications or [compile]?")
-                choice_ = input("\n\n > ").lower()
+
+                choice_ = Input()
 
                 if choice_ == 'add':
                     mod_dict = MOD(mod_dict)
 
                 elif choice_ == 'compile':
-                    COMP(ligand_dict, core_dict, mod_dict, extra_dict)
+                    COMP(ligand_dict, core_dict, mod_dict, param_dict)
 
             else:
-                COMP(ligand_dict, core_dict, mod_dict, extra_dict)
+                COMP(ligand_dict, core_dict, mod_dict, param_dict)
 
         elif choice == '6':
             print ("________________________")
@@ -95,8 +94,8 @@ def MENU():
                 print (k, v)
 
             print ("________________________")
-            print ("Molsimplify Extras:\n")
-            for k, v in extra_dict.items():
+            print ("Molsimplify Parameters:\n")
+            for k, v in param_dict.items():
                 print (k, v)
             print ()
 
