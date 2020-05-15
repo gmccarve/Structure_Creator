@@ -1,6 +1,12 @@
 import os
 import sys
+import itertools
 
+""" 
+
+    TODO
+
+"""
 
 def FILE_INPUT(input_file):
 
@@ -145,17 +151,12 @@ def FILE_INPUT(input_file):
             elif item.startswith('ligand'):
 
                 count = 1
-                temp = []
+                temp  = []
 
-                lig_envir = item.lower().split(" ")[1:][0]
-                ligand    = item.lower().split(" ")[1:][1]
+                ligand = item.lower().split(" ")[1:][0]
 
-                try:
-                    ligand_dict[lig_envir]
-                except:
-                    ligand_dict[lig_envir] = {}
-
-                ligand_dict[lig_envir][ligand] = {}
+                temp_lig_dict = {}
+                temp_lig_dict[ligand] = {}
 
                 while ff[j+count].startswith('end') == False:
 
@@ -167,18 +168,31 @@ def FILE_INPUT(input_file):
 
                 for j in temp:
                     j_low = j.lower()
-                    j_val = j.lower().split(" ")[1:]
+                    if "[" not in j_low or "]" not in j_low:
+                        j_val = j.lower().split(" ")[1:]
+                    else:
+                        j_val = j_low[9:]
+                        while j_val.startswith(" "):
+                            j_val = j_val[1:]
+                        while j_val.endswith(" "):
+                            j_val = j_val[:1]
+                        j_val = j_val.split("] [")
+                        j_val[0] = j_val[0][1:]
+                        j_val[-1] = j_val[-1][:-1]
+                        for jj in range(len(j_val)):
+                            j_val[jj] = j_val[jj].split(" ")
+                            
                     if j_low.startswith("symmetric"):
-                        ligand_dict[lig_envir][ligand]['Symmetric Hs'] = j_val
+                        temp_lig_dict[ligand]['Symmetric Hs'] = j_val
 
                     elif j_low.startswith("nonsymmetric"):
-                        ligand_dict[lig_envir][ligand]['Non-Symmetric Hs'] = j_val
+                        temp_lig_dict[ligand]['Non-Symmetric Hs'] = j_val
 
                     elif j_low.startswith('all'):
-                        ligand_dict[lig_envir][ligand]['All Hs'] = j_val
+                        temp_lig_dict[ligand]['All Hs'] = j_val
 
                     elif j_low.startswith('ligocc'):
-                        ligand_dict[lig_envir][ligand]['Ligand Frequency'] = j_val
+                        temp_lig_dict[ligand]['Ligand Frequency'] = int(j_val[0])
 
                     elif j_low.startswith('add_lig'):
                         add_lig_file = j.split(" ")[1:][0]
@@ -191,6 +205,14 @@ def FILE_INPUT(input_file):
                         add_con_atom = str(add_con_atom)[:-1] + "]"
                         CON_ATOM = True
 
+                    elif j_low.startswith("environment"):
+                        lig_envir = int(j_val[0])
+
+                try:
+                    temp_lig_dict[ligand]['Ligand Frequency']
+                except:
+                    temp_lig_dict[ligand]['Ligand Frequency'] = 1
+
                 if ADD_LIG == True and CON_ATOM == True:
 
                     os.system("molsimplify -ligadd " + add_lig_file + " -ligname " + ligand + " -ligcon " + add_con_atom )
@@ -199,54 +221,70 @@ def FILE_INPUT(input_file):
                     print ("\n\nLigand added successfully. Use at your own risk")
 
                 try:
-                    ligand_dict[lig_envir][ligand]['All Hs']
+                    temp_lig_dict[ligand]['All Hs']
                     allH = True
                 except:
                     allH = False
 
                 try:
-                    ligand_dict[lig_envir][ligand]['Symmetric Hs']
+                    temp_lig_dict[ligand]['Symmetric Hs']
                     symH = True
                 except:
                     symH = False
 
                 try:
-                    ligand_dict[lig_envir][ligand]['Non-Symmetric Hs']
+                    temp_lig_dict[ligand]['Non-Symmetric Hs']
                     nonsymH = True
                 except:
                     nonsymH = False
 
                 if allH == True and symH == True:
 
-                    for i in ligand_dict[lig_envir][ligand]['Symmetric Hs']:
-                        if i in ligand_dict[lig_envir][ligand]['All Hs']:
-                            ligand_dict[lig_envir][ligand]['All Hs'].remove(i)
+                    for i in temp_lig_dict[ligand]['Symmetric Hs']:
+                        if i in temp_lig_dict[ligand]['All Hs']:
+                            temp_lig_dict[ligand]['All Hs'].remove(i)
 
-                    ligand_dict[lig_envir][ligand]['Non-Symmetric Hs'] = ligand_dict[lig_envir][ligand]['All Hs']
-                    del ligand_dict[lig_envir][ligand]['All Hs']
+                    temp_lig_dict[ligand]['Non-Symmetric Hs'] = temp_lig_dict[ligand]['All Hs']
+                    del temp_lig_dict[ligand]['All Hs']
 
                 elif symH == True and nonsymH == False:
-                    ligand_dict[lig_envir][ligand]['Non-Symmetric Hs'] = []
+                    temp_lig_dict[ligand]['Non-Symmetric Hs'] = []
 
                 elif  symH == False and nonsymH == True:
-                    ligand_dict[lig_envir][ligand]['Symmetric Hs'] = []
+                    temp_lig_dict[ligand]['Symmetric Hs'] = []
 
                 elif symH == False and nonsymH == False:
-                    ligand_dict[lig_envir][ligand]['Symmetric Hs'] = []
-                    ligand_dict[lig_envir][ligand]['Non-Symmetric Hs'] = []
+                    temp_lig_dict[ligand]['Symmetric Hs'] = []
+                    temp_lig_dict[ligand]['Non-Symmetric Hs'] = []
 
-                if symH == True and len(ligand_dict[lig_envir][ligand]['Symmetric Hs']) == 1:
-                    print ("There must be more than one symmetric substitution sites for ligands. \nMoving to non-symmeric dictionary")
+                if symH == True and len(temp_lig_dict[ligand]['Symmetric Hs']) == 1:
+                    print ("There must be more than one symmetric substitution sites for ligands. \
+                            \nMoving to non-symmeric dictionary")
+                    
                     temp = []
-                    for jj in ligand_dict[lig_envir][ligand]['Symmetric Hs']:
+                    for jj in temp_lig_dict[ligand]['Symmetric Hs']:
                         temp.append(jj)
 
-                    if len(ligand_dict[lig_envir][ligand]['Non-Symmetric Hs']) != 0:
-                        for jj in ligand_dict[lig_envir][ligand]['Non-Symmetric Hs']:
+                    if len(temp_lig_dict[ligand]['Non-Symmetric Hs']) != 0:
+                        for jj in temp_lig_dict[ligand]['Non-Symmetric Hs']:
                             temp.append(jj)
 
-                    ligand_dict[lig_envir][ligand]['Non-Symmetric Hs']  = temp
-                    ligand_dict[lig_envir][ligand]['Symmetric Hs'] = []
+                    temp_lig_dict[ligand]['Non-Symmetric Hs']  = temp
+                    temp_lig_dict[ligand]['Symmetric Hs'] = []
+
+                try:
+                    lig_envir
+                except:
+                    print ("Input file read unseccefully")
+                    print ("Must Specify the environment for each ligand")
+                    sys.exit()
+
+                try:
+                    ligand_dict[lig_envir]
+                except:
+                    ligand_dict[lig_envir] = []
+
+                ligand_dict[lig_envir].append(temp_lig_dict)
 
 
 
@@ -320,9 +358,10 @@ def FILE_INPUT(input_file):
         for k, v in ligand_dict.items():
             print (k)
             print ()
-            for kk, vv in v.items():
-                print (kk, vv)
-            print ()
+            for j in v:
+                for kk, vv in j.items():
+                    print (kk, vv)
+                print ()
 
         print ("________________________")
         print ("Modifications:\n")
