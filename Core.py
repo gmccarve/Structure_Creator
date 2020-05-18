@@ -1,5 +1,9 @@
 import os
 
+    #TODO Ensure ability to work with non-atom based cores
+    #TODO Add symmetry
+
+
 def CORE(core_dict):
 
     def Input():
@@ -35,10 +39,10 @@ def CORE(core_dict):
         return
 
     def ADD(core_dict, core):
-        print ("\n\n Which hydrogens (if any) would you like to modify for this core?")
-        core_mod = input(" Type 'all' to modify all hydrogens, \
-                        \n      'none' to modify no hydrogens, or\
-                        \n      'manual' to add hydrogens by index\n\n > ").lower()
+        print ("\n\n Which hydrogens (if any) would you like to modify for this core?\
+                  \n Type 'all' to modify all hydrogens, \
+                  \n      'none' to modify no hydrogens, or\
+                  \n      'manual' to add hydrogens by index\n\n")
 
         core_mod = Input()
 
@@ -50,6 +54,9 @@ def CORE(core_dict):
                 count = 0
 
                 if END == '.mol':
+                    temp_ = str(lines[3])
+                    while temp_.startswith(" "):
+                        temp_ = temp_[1:]
                     Num_atoms = int(lines[3].split(" ")[1])
                     del lines[:4]
                 elif END == '.xyz':
@@ -68,16 +75,36 @@ def CORE(core_dict):
             return
 
         elif core_mod == 'manual':
-            print ("\n Type the indices of any symmetric hydrogens or 'skip' to skip\n\n")
+            print ("\n Type the indices of any symmetric hydrogens. \
+                    \n For groups of symmetric hydrogens, put [ ] around them.\
+                    \n Type 'skip' to skip\n\n")
             
             symmetric_hs = Input()
             
             if symmetric_hs != 'skip':
 
-                symmetric_hs = symmetric_hs.split(" ")
-            
-                for j in range(len(symmetric_hs)):
-                    symmetric_hs[j] = int(symmetric_hs[j])
+                if "[" not in symmetric_hs or "]" not in symmetric_hs:
+
+                    symmetric_hs = symmetric_hs.split(" ")
+                    for j in range(len(symmetric_hs)):
+                        symmetric_hs[j] = int(symmetric_hs[j])
+
+                else:
+
+                    try:
+
+                        symmetric_hs = symmetric_hs.split("] [")
+                        symmetric_hs[0] = symmetric_hs[0][1:]
+                        symmetric_hs[-1] = symmetric_hs[-1][:-1]
+
+                        for jj in range(len(symmetric_hs)):
+                            symmetric_hs[jj] = symmetric_hs[jj].split(" ")
+                            for jjj in range(len(symmetric_hs[jj])):
+                                symmetric_hs[jj][jjj] = int(symmetric_hs[jj][jjj])
+
+                    except:
+                        symmetric_hs = []
+
 
                 core_dict[core]['Symmetric Hs'] = symmetric_hs
 
@@ -170,29 +197,27 @@ def CORE(core_dict):
 
             if core_len > 2:
 
-                print("\n What would you like to do?")
-                print (" 1 - Display the core file\
-                      \n 2 - Choose which atoms to modify\
-                      \n 3 - Skip")
+                show_mod = '1'
 
-                show_mod = Input()
+                while show_mod == '1':
 
+                    print("\n What would you like to do?\
+                           \n 1 - Display the core file\
+                           \n 2 - Choose which atoms to modify\
+                           \n 3 - Skip")
 
-                if show_mod == '1':
-                    with open(MolSim + "Cores/" + core_location) as f:
-                        for line in f:
-                            print (str(line)[:-1])
+                    show_mod = Input()
 
-                    ADD(core_dict, core)
+                    if show_mod == '1':
+                        with open(MolSim + "Cores/" + core_location) as f:
+                            for line in f:
+                                print (str(line)[:-1])
 
+                    elif show_mod == '2':
+                        ADD(core_dict, core)
 
-                elif show_mod == '2':
-
-                    ADD(core_dict, core)
-
-                elif show_mod == '3':
-
-                    temp = 0
+                    else:
+                        pass
 
         
         elif choice == '2':
