@@ -7,6 +7,8 @@ from Mod import MOD
 from Parameters import PARAM
 from Comp import COMP
 
+#TODO Add core symmetric [[], []]]
+
 
 def MENU():
 
@@ -40,7 +42,7 @@ def MENU():
                   \n 4 - Define molsimplify parameters\
                   \n 5 - Compile structures\
                   \n 6 - Print information\
-                  \n 7 - Exit")
+                  \n 7 - Exit\n")
 
         choice = Input()
 
@@ -84,9 +86,10 @@ def MENU():
             for k, v in ligand_dict.items():
                 print (k)
                 print ()
-                for kk, vv in v.items():
-                    print (kk, vv)
-                print ()
+                for kk in v:
+                    for kkk, vvv in kk.items():
+                        print (kkk, vvv)
+                    print ()
 
             print ("________________________")
             print ("Modifications:\n")

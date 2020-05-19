@@ -66,6 +66,9 @@ def COMP(ligand_dict, core_dict, mod_dict, param_dict):
             COREMOD(core, core_mod, ligand_dict, mod_dict, param_dict)
         elif num_core_atoms == 0:
             LIGMOD(core, ligand_dict, mod_dict, param_dict)
+        elif num_core_atoms == 0 and num_lig_atoms == 0:
+            print ("Nothing to do")
+            sys.exit()
         else:
             FULLMOD(core, core_mod, ligand_dict, mod_dict, param_dict)
 

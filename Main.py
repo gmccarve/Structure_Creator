@@ -11,6 +11,7 @@ from Menu import MENU
         
     1 - check for OS
     2 - check if molsimplify added/active
+    3 - Add Classes ******
 
 
 """

@@ -2,11 +2,9 @@ import os
 import sys
 import itertools
 
-""" 
 
-    TODO
+#TODO Add core symmetry
 
-"""
 
 def FILE_INPUT(input_file):
 

@@ -276,10 +276,10 @@ def LIGAND(ligand_dict):
 
                 while show_mod == '1':
 
-                    print("\n What would you like to do?")
-                    print (" 1 - Display the ligand file\
-                          \n 2 - Choose which atoms to modify\
-                          \n 3 - Skip\n")
+                    print("\n What would you like to do?\
+                           \n 1 - Display the ligand file\
+                           \n 2 - Choose which atoms to modify\
+                           \n 3 - Skip\n")
 
                     show_mod = Input()
 
@@ -334,10 +334,7 @@ def LIGAND(ligand_dict):
                 temp = check_ligand(ligand, ligand_file)
 
                 if temp[0] == True:
-
-                    print ("HEREEEEEEEEEEEEEEEE")
                     ligand_file_temp = str(temp[1].split(",")[0].split(":")[1])
-
 
                 lig_test = True
 
