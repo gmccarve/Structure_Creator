@@ -25,7 +25,8 @@ def TEST(lst):
 
 def LIGMOD(core, ligand_dict, mod_dict, param_dict):
 
-    structure_count = []
+    structure_count = 0
+    sub_counts = []
 
     numsub = mod_dict['Number of Substitutions']
     mods   = mod_dict['Modifications']
@@ -133,9 +134,6 @@ def LIGMOD(core, ligand_dict, mod_dict, param_dict):
 
             ind_perm = []
 
-            waste = []
-
-
             for j in temp:
                 subs  = []
                 sites = []
@@ -147,7 +145,6 @@ def LIGMOD(core, ligand_dict, mod_dict, param_dict):
 
                 for jj in range(len(temp2)):
                     sites.append(len(temp2[jj][1]))
-
                 
                 if sum(sites) >= i:
                     flag = True
@@ -157,15 +154,6 @@ def LIGMOD(core, ligand_dict, mod_dict, param_dict):
 
                     if flag == True:
                         ind_perm.append(j)
-
-
-            if list(itertools.chain.from_iterable(ind_perm)) == []:
-
-                print ("Congratulations. Somehow you got this far with too many substitutions and too few")
-                print ("substitution sites. Don't do that again.")
-                print ("Skipping environment #%s." %i)
-                print ()
-                break
 
             unique = []
 
@@ -191,22 +179,46 @@ def LIGMOD(core, ligand_dict, mod_dict, param_dict):
                     lig_for_file[jj[0]] = ligands[jj[0]]
                     num_for_file[jj[0]] = ligoccu[jj[0]]
 
-                test = []
-                for jj in range(len(ind)):
-                    if ind[jj][0] not in test:
-                        test.append(ind[jj][0])
 
-                sub_for_file = list(sub)
-                ind_for_file = [[] for i in range(len(test))]
-                
-                for jj in range(len(test)):
-                    ind_for_file[jj] = ind[jj:]
+                temp = []
+                for jj in ind:
+                    temp.append(jj[0])
 
-                print (lig_for_file, num_for_file, sub_for_file, ind)
-                
-                
+                temp_ = {}
+                for jj in temp:
+                    temp_[jj] = temp.count(jj)
 
-                
+                temp = temp_
+
+                sub_for_file = []
+                ind_for_file = []
+
+                sub_counter = 0
+                for k, v in temp.items():
+                    temp_ = []
+                    for jj in range(v):
+                        temp_.append(sub[sub_counter:sub_counter+v][0])
+                    sub_for_file.append(temp_)
+                    sub_counter += v
+
+                temp_ = []
+                for jj in range(i):
+                    temp_.append(ind[jj][1])
+
+                for jj in range(len(temp_)):
+                    jj_ind_min = min(jj+1, len(temp_[jj]))-1
+
+                    ind_for_file.append(temp_[jj][jj_ind_min])
+
+                temp = []
+                jj_counter = 0
+                for jj in range(len(sub_for_file)):
+                    jj_len = len(sub_for_file[jj])
+                    temp.append(ind_for_file[jj_counter:jj_len+jj_counter])
+                    jj_counter += jj_len
+
+                ind_for_file = temp
+
 
                 with open(core + "/" + str(envir_num) + "/Structures", "a+") as f:
 
@@ -225,48 +237,69 @@ def LIGMOD(core, ligand_dict, mod_dict, param_dict):
 
 
                     f.write(mod_txt + "\tfor ligands " + lig_txt + "\ton sites " + sub_txt + "\n")
-                    
-        
 
-                with open(core + "/" + str(envir_num) + "/mol_files/" + str(sub_count) + ".mol", "w") as f:
+                with open(core + "/" + str(envir_num) + "/mol_files/" + str(structure_count) + ".mol", "w") as f:
 
                     f.write("-core "   + core + "\n")
                     f.write("-rundir " + core + "/" + str(envir_num) + "/runs/\n")
 
                     f.write("-lig ")
-                    temp_lig = [''] * len(ligands)
-                    for jj in ind:
-                        lig_ = ligands[jj[0]]
-                        f.write(lig_ + " ")
-                        temp_lig[jj[0]] = lig_
-                    for jj in range(len(ligands)):
-                        if temp_lig[jj] == '':
+
+                    for jj in range(len(lig_for_file)):
+                        if lig_for_file[jj] != '':
+                            f.write(lig_for_file[jj] + " ")
+
+                    for jj in range(len(lig_for_file)):
+                        if lig_for_file[jj] == '':
                             f.write(ligands[jj] + " ")
+
                     f.write("\n")
 
                     f.write("-ligocc ")
-                    for jj in ligoccu:
-                        f.write(str(jj) + " ")
+
+                    for jj in range(len(num_for_file)):
+                        if num_for_file[jj] != '':
+                            f.write(num_for_file[jj] + " ")
+
+                    for jj in range(len(num_for_file)):
+                        if num_for_file[jj] == '':
+                            f.write(ligoccu[jj] + " ")
+
                     f.write("\n")
 
                     f.write("-decoration ")
-                    for jj in sub:
-                        f.write("[" + str(jj) + "] ")
+
+                    for jj in range(len(sub_for_file)):
+                        if len(sub_for_file[jj]) == 1:
+                            f.write("[" + sub_for_file[jj][0] + "] ")
+                        else:
+                            string =  "["
+                            for jjj in range(len(sub_for_file[jj])):
+                                string += sub_for_file[jj][jjj]
+                                string += ","
+                            string = string[:-1]
+                            f.write(string + "] ")
+
                     f.write("\n")
 
                     f.write("-decoration_index ")
-                    if all(elem == ind[0] for elem in ind) and len(ind) != 1:
-                        for jj in range(len(ind)):
-                            f.write("[" + str(ind[jj][1][jj]) + "] ")
-                    else:
-                        for jj in ind:
-                            f.write("[" + str(jj[1][0]) + "] ")
+
+                    for jj in range(len(ind_for_file)):
+                        if len(ind_for_file[jj]) == 1:
+                            f.write("[" + str(ind_for_file[jj][0]) + "] ")
+                        else:
+                            string =  "["
+                            for jjj in range(len(ind_for_file[jj])):
+                                string += str(ind_for_file[jj][jjj])
+                                string += ","
+                            string = string[:-1]
+                            f.write(string + "] ")
+
                     f.write("\n")
 
                     for k, v in param_dict.items():
                         f.write("-" + str(k) + " " + str(v) + "\n")
 
-                
                 #os.system("molsimplify -i " + core + "/" + str(envir_num) + "/mol_files/" + str(structure_count) + ".mol")
                 #os.system("cp " + core + "/" +  str(envir_num) + "/runs/*/*/*.xyz" + \
                 #                " " + core + "/" + str(envir_num) + "/xyz/" + str(structure_count) + ".xyz")
@@ -274,17 +307,20 @@ def LIGMOD(core, ligand_dict, mod_dict, param_dict):
                 
                 #os.system("cat " + core + "/" + str(envir_num) + "/mol_files/" + str(sub_count) + ".mol; echo")
 
+                structure_count += 1
                 sub_count += 1
 
-            structure_count.append(sub_count)
-    
+
+            sub_counts.append(sub_count)
+
             with open(core + "/" + str(envir_num) + "/Structures", "a+") as f:
                 f.write("\n%s structures created using %s substitutions" %(sub_count, i))
                 f.write("\n\n")
 
-        
+    for j in range(len(numsub)):
+        print ("%s \ttotal structures generated with %s substitutions" %(sub_counts[j], j))
 
-    print ("%s total structures generated" %(sum(structure_count)))
+    print ("%s \ttotal structures generated" %(structure_count))
 
     
     return
@@ -311,13 +347,14 @@ if __name__ == "__main__":
     elif sys.argv[1] == 'test':
 
         ligand_dict = {0:
-                     [{'acac': {'Number of Ligands': '3', 'All Hs': [8, 9, 10, 11, 12, 13, 14]}}]
+                     [{'acac': {'Number of Ligands': '2', 'All Hs': [8, 9, 10, 11, 12, 13, 14]}},
+                      {'no3' : {'Number of Ligands': '1'}}]
                      }
 
 
     core        = 'la'
 
-    mod_dict    = {'Modifications': ['f', 'cl'], 'Number of Substitutions': [1, 2]}
+    mod_dict    = {'Modifications': ['f', 'cl', 'br'], 'Number of Substitutions': [1, 2, 3]}
 
     param_dict = {'geometry': 'oct'}
 
