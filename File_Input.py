@@ -3,9 +3,6 @@ import sys
 import itertools
 
 
-#TODO Check for correct types
-
-
 def FILE_INPUT(input_file):
 
     def Find_Molsim():
@@ -45,21 +42,28 @@ def FILE_INPUT(input_file):
     with open(input_file) as f:
         ff = f.readlines()
 
-    count = 0
     for j in ff:
         if j.startswith("#"):
             ff.remove(j)
+
+    count = 0
+    for j in ff:
+        temp = list(j)
+        if '\n' in temp and temp != ['\n']:
+            temp.remove('\n')
+        while temp[0] == ' ' or temp[0] == '':
+            temp = temp[1:]
+        if temp != ['\n']:
+            while temp[-1] == ' ' or temp[-1] == '':
+                temp = temp[:-1]
+        ff[count] = ''.join(temp)
         while '  ' in ff[count]:
             ff[count] = ff[count].replace("  ", " ")
 
         count += 1
 
     for j in range(len(ff)):
-        line = str(ff[j])[:-1]
-        while line.startswith(" "):
-            line = line[1:]
-        while line.endswith("\n") or line.endswith(" "):
-            line = line[:-1]
+        line = str(ff[j])
 
         if line.startswith("%"):
             item = str(line)[1:].lower()
@@ -74,13 +78,19 @@ def FILE_INPUT(input_file):
 
                 while ff[j+count].startswith('end') == False:
 
-                    temp.append(str(ff[j+count])[:-1])
+                    temp.append(str(ff[j+count]))
 
                     count += 1
 
                 CORE_FILE, CON_ATOM, MAX_DENT = False, False, False
 
                 for jj in temp:
+                    temp_ = list(jj)
+                    while temp_[-1] == ' ':
+                        temp_ = temp_[:-1]
+                    sep = ''
+                    jj = sep.join(temp_)
+
                     j_low = jj.lower()
 
                     if "[" not in j_low or "]" not in j_low:
@@ -98,24 +108,25 @@ def FILE_INPUT(input_file):
                             j_val[jjj] = j_val[jjj].split(" ")
 
                     if j_low.startswith("symmetric"):
-                        #CheckInt(j_val, jj, ff.index(str(j_low)+"\n"))
+                        CheckInt(j_val, jj, ff.index(jj))
                         core_dict[core]['Symmetric Hs'] = j_val
 
                     elif j_low.startswith("nonsymmetric"):
-                        CheckInt(j_val, jj, ff.index(jj+"\n"))
+                        CheckInt(j_val, jj, ff.index(jj))
                         core_dict[core]['Non-Symmetric Hs'] = j_val
 
                     elif j_low.startswith('all'):
-                        CheckInt(j_val, jj, ff.index(jj+"\n"))
+                        CheckInt(j_val, jj, ff.index(jj))
                         core_dict[core]['All Hs'] = j_val
 
                     elif j_low.startswith('add_core'):
                         add_core_file = jj.split(" ")[1:][0]
                         CORE_FILE = True
-                        CheckFile(add_core_file, jj, ff.index(jj+"\n"))
+                        CheckFile(add_core_file, jj, ff.index(jj))
 
                     elif j_low.startswith('add_con_atom'):
-                        CheckInt(j_val, jj, ff.index(jj+"\n"))
+                        CheckInt(j_val, jj, ff.index(jj))
+
                         add_con_atom = ""
                         for j in j_val:
                             add_con_atom += j + " "
@@ -123,12 +134,12 @@ def FILE_INPUT(input_file):
                         CON_ATOM = True
 
                     elif j_low.startswith('add_max_dent'):
-                        CheckInt(j_val, jj, ff.index(jj+"\n"))
+                        CheckInt(j_val, jj, ff.index(jj))
                         add_max_dent = j_val[0]
                         MAX_DENT = True
 
                     else:
-                        print ("UNRECOGNIZED VALUE IN LINE %s - %s" %(ff.index(jj+"\n"), jj))
+                        print ("UNRECOGNIZED VALUE IN LINE %s - %s" %(ff.index(jj), jj))
                         sys.exit()
 
                 if CORE_FILE == True and CON_ATOM == True and MAX_DENT == True:
@@ -171,9 +182,13 @@ def FILE_INPUT(input_file):
 
                 if allH == True and symH == True and nonsymH == True or allH == True and symH == True and nonsymH == False:
 
-                    for i in core_dict[core]['Symmetric Hs']:
+                    for i in list(itertools.chain(*core_dict[core]['Symmetric Hs'])):
                         if i in core_dict[core]['All Hs']:
                             core_dict[core]['All Hs'].remove(i)
+
+                    for i in core_dict[core]['All Hs']:
+                        if i not in core_dict[core]['Non-Symmetric Hs']:
+                            core_dict[core]['Non-Symmetric Hs'].append(i)
 
                     core_dict[core]['Non-Symmetric Hs'] = core_dict[core]['All Hs']
                     del core_dict[core]['All Hs']
@@ -189,7 +204,8 @@ def FILE_INPUT(input_file):
                     core_dict[core]['Non-Symmetric Hs'] = []
 
                 if symH == True and len(list(itertools.chain(*core_dict[core]['Symmetric Hs']))) == 1:
-                    print ("There must be more than one symmetric substitution sites for cores. \nMoving to non-symmeric dictionary")
+                    print ("There must be more than one symmetric substitution sites for cores. \
+                          \nMoving to non-symmeric dictionary")
 
                     temp = []
                     for jj in core_dict[core]['Symmetric Hs']:
@@ -213,7 +229,7 @@ def FILE_INPUT(input_file):
 
                 while ff[j+count].startswith('end') == False:
 
-                    temp.append(str(ff[j+count])[:-1])
+                    temp.append(str(ff[j+count]))
 
                     count += 1
 
@@ -236,28 +252,28 @@ def FILE_INPUT(input_file):
                             j_val[jjj] = j_val[jjj].split(" ")
 
                     if j_low.startswith("symmetric"):
-                        CheckInt(j_val, jj, ff.index(str(j_low)+"\n"))
+                        CheckInt(j_val, jj, ff.index(jj))
                         temp_lig_dict[ligand]['Symmetric Hs'] = j_val
 
                     elif j_low.startswith("nonsymmetric"):
-                        CheckInt(j_val, jj, ff.index(jj+"\n"))
+                        CheckInt(j_val, jj, ff.index(jj))
                         temp_lig_dict[ligand]['Non-Symmetric Hs'] = j_val
 
                     elif j_low.startswith('all'):
-                        CheckInt(j_val, jj, ff.index(jj+"\n"))
+                        CheckInt(j_val, jj, ff.index(jj))
                         temp_lig_dict[ligand]['All Hs'] = j_val
 
                     elif j_low.startswith('ligocc'):
-                        CheckInt(j_val, jj, ff.index(jj+"\n"))
+                        CheckInt(j_val, jj, ff.index(jj))
                         temp_lig_dict[ligand]['Ligand Frequency'] = int(j_val[0])
 
                     elif j_low.startswith('add_lig'):
                         add_lig_file = jj.split(" ")[1:][0]
                         ADD_LIG = True
-                        CheckFile(add_lig_file, jj, ff.index(jj+"\n"))
+                        CheckFile(add_lig_file, jj, ff.index(jj))
 
                     elif j_low.startswith("add_con_atom"):
-                        CheckInt(j_val, jj, ff.index(jj+"\n"))
+                        CheckInt(j_val, jj, ff.index(jj))
                         add_con_atom = "["
                         for j in j_val:
                             add_con_atom += j + ","
@@ -265,11 +281,11 @@ def FILE_INPUT(input_file):
                         CON_ATOM = True
 
                     elif j_low.startswith("environment"):
-                        CheckInt(j_val, jj, ff.index(jj+"\n"))
+                        CheckInt(j_val, jj, ff.index(jj))
                         lig_envir = int(j_val[0])
                     
                     else:
-                        print ("UNRECOGNIZED VALUE IN LINE %s - %s" %(ff.index(jj+"\n"), jj))
+                        print ("UNRECOGNIZED VALUE IN LINE %s - %s" %(ff.index(jj), jj))
                         sys.exit()
 
                 try:
@@ -304,11 +320,14 @@ def FILE_INPUT(input_file):
 
                 if allH == True and symH == True:
 
-                    for i in temp_lig_dict[ligand]['Symmetric Hs']:
+                    for i in list(itertools.chain(*temp_lig_dict[ligand]['Symmetric Hs'])):
                         if i in temp_lig_dict[ligand]['All Hs']:
                             temp_lig_dict[ligand]['All Hs'].remove(i)
 
-                    temp_lig_dict[ligand]['Non-Symmetric Hs'] = temp_lig_dict[ligand]['All Hs']
+                    for i in temp_lig_dict[ligand]['All Hs']:
+                        if i not in temp_lig_dict[ligand]['Non-Symmetric Hs']:
+                            temp_lig_dict[ligand]['Non-Symmetric Hs'].append(i)
+
                     del temp_lig_dict[ligand]['All Hs']
 
                 elif symH == True and nonsymH == False:
@@ -354,40 +373,50 @@ def FILE_INPUT(input_file):
                 count = 1
                 temp = []
 
+                add_mod_file = []
+                add_con_atom = []
+
                 ADD_MOD, CON_ATOM = False, False
 
                 while ff[j+count].startswith('end') == False:
+                    jj = ff[j+count]
 
                     if ff[j+count].lower().startswith('numsub'):
-                        subs = str(ff[j+count])[:-1].split(" ")[1:]
+                        subs = str(jj).split(" ")[1:]
                         mod_dict['Number of Substitutions'] = subs
-                        CheckInt(subs, jj, ff.index(jj+"\n"))
+                        CheckInt(subs, jj, ff.index(jj))
 
                     elif ff[j+count].lower().startswith("add_mod"):
-                        add_mod_file = str(ff[j+count])[:-1].split(" ")[1:][0]
-                        ADD_MOD = True
-                        CheckFile(add_mod_file, jj, ff.index(jj+"\n"))
+                        CheckFile(str(jj).split(" ")[1:][0], jj, ff.index(jj))
+                        add_mod_file.append(str(ff[j+count]).split(" ")[1:][0])
 
                     elif ff[j+count].lower().startswith("add_con_atom"):
-                        add_con_atom = "["
-                        for k in ff[j+count].lower().split(" ")[1:]:
-                            add_con_atom += k + ","
-                        add_con_atom = str(add_con_atom)[:-1] + "]"
-                        CON_ATOM = True
-                        CheckInt(list(add_con_atom), jj, ff.index(jj+"\n"))
+                        CheckInt(str(jj).split(" ")[1:][0], jj, ff.index(jj))
+                        temp_ = "["
+                        for k in jj.lower().split(" ")[1:]:
+                            temp_ += k + ","
+                        add_con_atom.append(str(temp_) + "]")
 
                     else:
-                        temp.append(str(ff[j+count])[:-1])
+                        temp.append(jj)
                     count += 1
+
+                    if len(add_mod_file) != len(add_con_atom):
+                        length = min(len(add_mod_file), len(add_con_atom))
+
+                        add_mod_file = add_mod_file[:length]
+                        add_con_atom = add_con_atom[:length]
 
                 mod_dict['Modifications'] = temp
 
+                for jj in range(len(add_mod_file)):
+                    add_mod  = add_mod_file[jj]
+                    con_atom = add_con_atom[jj]
 
-                if ADD_MOD == True and CON_ATOM == True:
-                    mod = add_mod_file.split(".")[0]
+                    mod = add_mod.split(".")[0]
 
-                    os.system("molsimplify -ligadd " + add_mod_file + " -ligname " + mod + " -ligcon " + add_con_atom )
-                    os.system("cp " + add_mod_file + " " + molsim + "Ligands/" + add_mod_file)
+                    os.system("molsimplify -ligadd " + add_mod + " -ligname " + mod + " -ligcon " + add_con)
+                    os.system("cp " + add_mod + " " + molsim + "Ligands/" + add_mod)
 
                     print ("\n\nLigand added successfully. Use at your own risk")
 
@@ -397,10 +426,9 @@ def FILE_INPUT(input_file):
 
                 while ff[j+count].startswith('end') == False:
                     temp = ff[j+count].split(" ")
-                    param_dict[temp[0]] = str(temp[1])[:-1]
+                    param_dict[temp[0]] = str(temp[1])
 
                     count += 1
-
 
 
     print ("\n\nInput file read successfully.")
