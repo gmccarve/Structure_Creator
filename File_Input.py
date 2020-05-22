@@ -3,7 +3,7 @@ import sys
 import itertools
 
 
-#TODO Add core symmetry
+#TODO Check for correct types
 
 
 def FILE_INPUT(input_file):
@@ -12,6 +12,25 @@ def FILE_INPUT(input_file):
         for root, dir, files in os.walk(os.path.expanduser('~')):
             if 'cores.dict' in files:
                 return str(root)[:-5]
+
+    def CheckInt(val, line, line_num):
+        if type(val) == list:
+            if any(isinstance(el, list) for el in val):
+                val = list(itertools.chain(*val))
+        for j in val:
+            try:
+                int(j)
+            except:
+                print ("INCORRECT DATATYPE ON LINE %s - %s" %(str(line_num+1), line))
+                sys.exit()
+
+    def CheckFile(check_file, line, line_num):
+        if os.path.exists(check_file):
+            pass
+        else:
+            print ("FILE %s ON LINE %s NOT FOUND" %(check_file, line_num))
+            sys.exit()
+
 
 
     core_dict   = {}
@@ -22,7 +41,6 @@ def FILE_INPUT(input_file):
     runcheck = False
 
     molsim = Find_Molsim()
-
 
     with open(input_file) as f:
         ff = f.readlines()
@@ -38,6 +56,10 @@ def FILE_INPUT(input_file):
 
     for j in range(len(ff)):
         line = str(ff[j])[:-1]
+        while line.startswith(" "):
+            line = line[1:]
+        while line.endswith("\n") or line.endswith(" "):
+            line = line[:-1]
 
         if line.startswith("%"):
             item = str(line)[1:].lower()
@@ -58,24 +80,42 @@ def FILE_INPUT(input_file):
 
                 CORE_FILE, CON_ATOM, MAX_DENT = False, False, False
 
-                for j in temp:
-                    j_low = j.lower()
-                    j_val = j.lower().split(" ")[1:]
+                for jj in temp:
+                    j_low = jj.lower()
+
+                    if "[" not in j_low or "]" not in j_low:
+                        j_val = jj.lower().split(" ")[1:]
+                    else:
+                        j_val = jj[9:]
+                        while j_val.startswith(" "):
+                            j_val = j_val[1:]
+                        while j_val.endswith(" "):
+                            j_val = j_val[:1]
+                        j_val = j_val.split("] [")
+                        j_val[0] = j_val[0][1:]
+                        j_val[-1] = j_val[-1][:-1]
+                        for jjj in range(len(j_val)):
+                            j_val[jjj] = j_val[jjj].split(" ")
 
                     if j_low.startswith("symmetric"):
+                        #CheckInt(j_val, jj, ff.index(str(j_low)+"\n"))
                         core_dict[core]['Symmetric Hs'] = j_val
 
                     elif j_low.startswith("nonsymmetric"):
+                        CheckInt(j_val, jj, ff.index(jj+"\n"))
                         core_dict[core]['Non-Symmetric Hs'] = j_val
 
                     elif j_low.startswith('all'):
+                        CheckInt(j_val, jj, ff.index(jj+"\n"))
                         core_dict[core]['All Hs'] = j_val
 
                     elif j_low.startswith('add_core'):
-                        add_core_file = j.split(" ")[1:][0]
+                        add_core_file = jj.split(" ")[1:][0]
                         CORE_FILE = True
+                        CheckFile(add_core_file, jj, ff.index(jj+"\n"))
 
                     elif j_low.startswith('add_con_atom'):
+                        CheckInt(j_val, jj, ff.index(jj+"\n"))
                         add_con_atom = ""
                         for j in j_val:
                             add_con_atom += j + " "
@@ -83,18 +123,33 @@ def FILE_INPUT(input_file):
                         CON_ATOM = True
 
                     elif j_low.startswith('add_max_dent'):
+                        CheckInt(j_val, jj, ff.index(jj+"\n"))
                         add_max_dent = j_val[0]
                         MAX_DENT = True
 
+                    else:
+                        print ("UNRECOGNIZED VALUE IN LINE %s - %s" %(ff.index(jj+"\n"), jj))
+                        sys.exit()
+
                 if CORE_FILE == True and CON_ATOM == True and MAX_DENT == True:
 
-                    os.system("cp " + add_core_file + " " + molsim + "Cores/" + add_core_file)
+                    if os.path.exists(molsim + "Cores/" + add_core_file):
+                        pass
+                    else:
+                        os.system("cp " + add_core_file + " " + molsim + "Cores/" + add_core_file)
+                    
+                    CORE_FILE_EXISTS = False
+                    with open(molsim + "Cores/cores.dict", "r") as fle:
+                        fle = fle.readlines()
+                    
+                    for line_ in fle:
+                        if (core.lower() + ":") in line_:
+                            CORE_FILE_EXISTS = True
 
-                    with open(molsim + "Cores/cores.dict", "a") as f:
-                        f.write(core + ":" + add_core_file + "," + add_con_atom + "," + add_max_dent + "\n")
-
-                    print ("\n\nCore added successfully. Use at your own risk.")
-
+                    if CORE_FILE_EXISTS == False:
+                        with open(molsim + "Cores/cores.dict", "a") as fle:
+                            fle.write(core + ":" + add_core_file + "," + add_con_atom + "," + add_max_dent + "\n")
+                            print ("\n\nCore %s added successfully. Use at your own risk." %core)
 
                 try:
                     core_dict[core]['All Hs']
@@ -133,7 +188,7 @@ def FILE_INPUT(input_file):
                     core_dict[core]['Symmetric Hs'] = []
                     core_dict[core]['Non-Symmetric Hs'] = []
 
-                if symH == True and len(core_dict[core]['Symmetric Hs']) == 1:
+                if symH == True and len(list(itertools.chain(*core_dict[core]['Symmetric Hs']))) == 1:
                     print ("There must be more than one symmetric substitution sites for cores. \nMoving to non-symmeric dictionary")
 
                     temp = []
@@ -164,10 +219,10 @@ def FILE_INPUT(input_file):
 
                 ADD_LIG, CON_ATOM = False, False
 
-                for j in temp:
-                    j_low = j.lower()
+                for jj in temp:
+                    j_low = jj.lower()
                     if "[" not in j_low or "]" not in j_low:
-                        j_val = j.lower().split(" ")[1:]
+                        j_val = jj.lower().split(" ")[1:]
                     else:
                         j_val = j_low[9:]
                         while j_val.startswith(" "):
@@ -177,26 +232,32 @@ def FILE_INPUT(input_file):
                         j_val = j_val.split("] [")
                         j_val[0] = j_val[0][1:]
                         j_val[-1] = j_val[-1][:-1]
-                        for jj in range(len(j_val)):
-                            j_val[jj] = j_val[jj].split(" ")
-                            
+                        for jjj in range(len(j_val)):
+                            j_val[jjj] = j_val[jjj].split(" ")
+
                     if j_low.startswith("symmetric"):
+                        CheckInt(j_val, jj, ff.index(str(j_low)+"\n"))
                         temp_lig_dict[ligand]['Symmetric Hs'] = j_val
 
                     elif j_low.startswith("nonsymmetric"):
+                        CheckInt(j_val, jj, ff.index(jj+"\n"))
                         temp_lig_dict[ligand]['Non-Symmetric Hs'] = j_val
 
                     elif j_low.startswith('all'):
+                        CheckInt(j_val, jj, ff.index(jj+"\n"))
                         temp_lig_dict[ligand]['All Hs'] = j_val
 
                     elif j_low.startswith('ligocc'):
+                        CheckInt(j_val, jj, ff.index(jj+"\n"))
                         temp_lig_dict[ligand]['Ligand Frequency'] = int(j_val[0])
 
                     elif j_low.startswith('add_lig'):
-                        add_lig_file = j.split(" ")[1:][0]
+                        add_lig_file = jj.split(" ")[1:][0]
                         ADD_LIG = True
+                        CheckFile(add_lig_file, jj, ff.index(jj+"\n"))
 
                     elif j_low.startswith("add_con_atom"):
+                        CheckInt(j_val, jj, ff.index(jj+"\n"))
                         add_con_atom = "["
                         for j in j_val:
                             add_con_atom += j + ","
@@ -204,7 +265,12 @@ def FILE_INPUT(input_file):
                         CON_ATOM = True
 
                     elif j_low.startswith("environment"):
+                        CheckInt(j_val, jj, ff.index(jj+"\n"))
                         lig_envir = int(j_val[0])
+                    
+                    else:
+                        print ("UNRECOGNIZED VALUE IN LINE %s - %s" %(ff.index(jj+"\n"), jj))
+                        sys.exit()
 
                 try:
                     temp_lig_dict[ligand]['Ligand Frequency']
@@ -255,7 +321,7 @@ def FILE_INPUT(input_file):
                     temp_lig_dict[ligand]['Symmetric Hs'] = []
                     temp_lig_dict[ligand]['Non-Symmetric Hs'] = []
 
-                if symH == True and len(temp_lig_dict[ligand]['Symmetric Hs']) == 1:
+                if symH == True and len(list(itertools.chain(*temp_lig_dict[ligand]['Symmetric Hs']))) == 1:
                     print ("There must be more than one symmetric substitution sites for ligands. \
                             \nMoving to non-symmeric dictionary")
                     
@@ -273,7 +339,7 @@ def FILE_INPUT(input_file):
                 try:
                     lig_envir
                 except:
-                    print ("Input file read unseccefully")
+                    print ("Input file read unsucessfully")
                     print ("Must Specify the environment for each ligand")
                     sys.exit()
 
@@ -283,8 +349,6 @@ def FILE_INPUT(input_file):
                     ligand_dict[lig_envir] = []
 
                 ligand_dict[lig_envir].append(temp_lig_dict)
-
-
 
             elif item == 'mod':
                 count = 1
@@ -297,10 +361,12 @@ def FILE_INPUT(input_file):
                     if ff[j+count].lower().startswith('numsub'):
                         subs = str(ff[j+count])[:-1].split(" ")[1:]
                         mod_dict['Number of Substitutions'] = subs
+                        CheckInt(subs, jj, ff.index(jj+"\n"))
 
                     elif ff[j+count].lower().startswith("add_mod"):
                         add_mod_file = str(ff[j+count])[:-1].split(" ")[1:][0]
                         ADD_MOD = True
+                        CheckFile(add_mod_file, jj, ff.index(jj+"\n"))
 
                     elif ff[j+count].lower().startswith("add_con_atom"):
                         add_con_atom = "["
@@ -308,6 +374,7 @@ def FILE_INPUT(input_file):
                             add_con_atom += k + ","
                         add_con_atom = str(add_con_atom)[:-1] + "]"
                         CON_ATOM = True
+                        CheckInt(list(add_con_atom), jj, ff.index(jj+"\n"))
 
                     else:
                         temp.append(str(ff[j+count])[:-1])
@@ -337,7 +404,7 @@ def FILE_INPUT(input_file):
 
 
     print ("\n\nInput file read successfully.")
-    print ("Would you like to [compile] or [print] the necessary dictionaries?")
+    print ("Would you like to [compile] or [print] the necessary dictionaries?\n")
     choice = input(" > ")
 
     if choice.lower() == 'compile':
@@ -360,6 +427,7 @@ def FILE_INPUT(input_file):
                 for kk, vv in j.items():
                     print (kk, vv)
                 print ()
+            print ()
 
         print ("________________________")
         print ("Modifications:\n")
