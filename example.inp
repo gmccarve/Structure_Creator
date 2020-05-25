@@ -1,0 +1,119 @@
+# Example input code for the Stucture_Creator program
+
+# To add a new core to the molsimplify program, include:
+#	- %core followed by the name of a core
+#	- add_core followed by the location of the xyz/mol file
+#	- add_con_atom followed by the connecting atom of the core separated by spaces
+#	- add_max_dent followed by the maximum denticity of the core
+#	- end to close this core
+
+%core Ce
+add_core Ce.xyz
+add_con_atom 0
+add_max_dent 8
+end
+
+
+# To add a core already available in molsimplify and not modify it (such as single atoms/ions), include:
+#	- %core followed by the name of the core
+#	- end to close this core
+
+%core La
+end
+
+
+# To add a core already available in molsimplify and modify it, include:
+#	- %core followed by the name of a core
+#	- symmetric followed by symmetric hydrogens
+#		These hydrogens must be separated using brackets and spaces
+#		Ex: [1 2 3] [4 5 6] for two methyl groups
+#	- nonsymmetric followed by nonsymmetric hydrogens
+#		These hydrogens must be separated by spaces
+#	- all followed by a list of all hydrogens
+#		Any hydrogen not already included in the nonsymmetric block
+#		will be added if the all keyword is included. 
+#		These hydrogens must be separated by spaces
+#	- end to close this core
+
+%core nickelporphryin
+symmetric [1 2 3]
+nonsymmetric 22
+all 1 2 3 22 24
+end
+
+
+# To add a new ligand to the molsimplify program and modify it, include:
+#	- %ligand followed by the name of the core
+#	- environment followed by the value of the environment
+#		The program loops over any number of different ligand
+#		environments and so that must be specified in the input file
+#	- ligocc followed by the number of ligands in the complex
+#	- symmetric followed by symmetric hydrogens
+#               These hydrogens must be separated using brackets and spaces
+#               Ex: [1 2 3] [4 5 6] for two methyl groups
+#       - nonsymmetric followed by nonsymmetric hydrogens
+#               These hydrogens must be separated by spaces
+#       - all followed by a list of all hydrogens
+#               Any hydrogen not already included in the nonsymmetric block
+#               will be added if the all keyword is included.
+#               These hydrogens must be separated by spaces
+#	- add_lig followed by the location of the xyz/mol file
+#	- add_con_atom followed by the connecting atoms of the ligand
+#	- end to close this core
+
+%ligand acac
+environment 0
+add_lig acac.xyz
+add_con_atom 3 4
+ligocc 1
+symmetric [8 9 10] [11 12 13]
+nonsymmetric 14
+all 8 9 10 11 12 13 14
+end
+
+
+#To add a ligand already available in molsimplify and not modify it, include:
+#       - %ligand followed by the name of the core
+#       - environment followed by the value of the environment
+#       - ligocc followed by the number of ligands in the complex
+#	- end to close this ligand
+
+%ligand nitrate
+environment 0
+ligocc 2
+end
+
+#To add any of the available molsimplify parameters, include:
+#	- %param
+# 	- any molsimplify parameter followed by its value
+#	- end to close the parameter block
+
+%param
+geometry oct
+keephs yes
+coord 6
+spin 1
+distort 0
+replig true
+keepHs true
+ligalign true
+end
+
+#To add the modifications to be used in the program, include:
+# 	- numsub followed by the number of substitutions separated by spaces
+#       - add_mod followed by the location of the xyz/mol file
+#       - add_con_atom followed by the connecting atoms of the ligand separated by spaces
+#	- Anything else included in this block is considered a modification
+#	- end to close the modification block
+
+
+%mod
+add_mod N4.xyz
+add_con_atom 0 1 2 3
+numsub 1 2 3 4 5
+f
+cl
+br
+methyl
+ethyl
+end
