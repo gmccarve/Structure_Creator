@@ -37,7 +37,7 @@ def MOD(mod_dict):
     
     if mod_dict == {}:
         mod_dict['Modifications'] = []
-        mod_dict['Number of Substitutions'] = []
+        mod_dict['Number of Substitutions'] = [1]
 
     mod_list = mod_dict['Modifications']
     sub_list = mod_dict['Number of Substitutions']
@@ -80,7 +80,7 @@ def MOD(mod_dict):
                 try:
 
                     os.system("molsimplify -ligadd " + mod_loc + " -ligname " + mod + " -ligcon " + con_atom )
-                    os.system("cp " + mod_loc + " " + molsim + "Ligands/" + mox_xyz)
+                    os.system("cp " + mod_loc + " " + molsim + "Ligands/" + mod_xyz)
 
                     print ("\n\n Modification added but use at your own risk")
 
@@ -107,56 +107,36 @@ def MOD(mod_dict):
 
         elif choice == '3':
 
-            if sub_list == []:
+            print ("\n 1 - To view number of modifications already given\n 2 - To change the number of modifications\n")
 
+            choice_ = Input()
+
+            if choice_ == '1':
+                print ("\n\n Number of modifications - ", end='' )
+                for j in sub_list:
+                    print (str(j), end=' ')
+
+                print ("\n")
+
+            elif choice_ == '2':
+
+                sub_list = []
+                    
                 print ("\n How many modifications would you like to make?")
-                print (" For multiple modifications, separate values by spaces\n")
-                
+                print (" For multiple modifications, separate values by spaces")
+                    
                 sub = Input()
 
-                temp = []
-                
                 try:
                     for j in sub.split(" "):
-                        sublist.append(int(j))
-
+                        if int(j) not in sub_list:
+                            sub_list.append(int(j))
+    
                 except:
                     print ("Incorrect input type. Only integers are accepted.")
                     print ("Setting number of modifications to 1")
 
                     sub_list = [1]
-
-
-            else:
-                print ("\n 1 - To view number of modifications already given\n 2 - To change the number of modifications\n")
-
-                choice_ = Input()
-
-                if choice_ == '1':
-                    print ("\n\n Number of modifications - ", end='' )
-                    for j in sub_list:
-                        print (str(j), end=' ')
-
-                    print ("\n")
-
-                elif choice_ == '2':
-
-                    sub_list = []
-                    
-                    print ("\n How many modifications would you like to make?")
-                    print (" For multiple modifications, separate values by spaces")
-                    
-                    sub = Input()
-
-                    try:
-                        for j in sub.split(" "):
-                            sublist.append(int(j))
-    
-                    except:
-                        print ("Incorrect input type. Only integers are accepted.")
-                        print ("Setting number of modifications to 1")
-
-                        sub_list = [1]
 
 
         elif choice == '4':

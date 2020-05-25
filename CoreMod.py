@@ -1,6 +1,7 @@
 import sys
 import os
 from itertools import combinations_with_replacement
+from itertools import product
 from collections import Counter
 
 """
@@ -11,13 +12,16 @@ from collections import Counter
 """
 
 
-def COREMOD(core, core_mod, mod_dict, param_dict):
+def COREMOD(core, core_mod, mod_dict, param_dict, compile_structures, size):
 
     structure_count = 0
 
     numsub = mod_dict['Number of Substitutions']
     mods   = mod_dict['Modifications']
 
+    for j in range(len(numsub)):
+        numsub[j] = int(numsub[j])
+    
     sub_counts = [0 for i in range(max(numsub))]
 
     if 'replig' not in param_dict:
@@ -82,6 +86,12 @@ def COREMOD(core, core_mod, mod_dict, param_dict):
         mod_perm = list(combinations_with_replacement(mods, i))
         ind_perm = list(combinations_with_replacement(record, i))
 
+        if size == 'large':
+            mod_perm = list(product(mods, repeat=i))
+
+        elif size == 'small':
+            mod_perm = list(combinations_with_replacement(mods, i))
+
         temp = []
         for j in ind_perm:
             if j not in temp:
@@ -110,6 +120,22 @@ def COREMOD(core, core_mod, mod_dict, param_dict):
         for j in unique:
             sub = j[0]
             ind = j[1]
+
+            temp = [''] * i
+            for j in range(i):
+                if len(ind[j]) == 1:
+                    temp[j] = int(ind[j][0])
+                else:
+                    trim = False
+                    jj = j
+                    while trim == False:
+                        try:
+                            temp[j] = int(ind[j][jj])
+                            trim = True
+                        except:
+                            jj -= 1
+
+            ind = temp
 
             with open(core + "/" + "/Structures", "a+") as f:
 
@@ -147,14 +173,13 @@ def COREMOD(core, core_mod, mod_dict, param_dict):
                 for k, v in param_dict.items():
                     f.write("-" + str(k) + " " + str(v) + "\n")
 
-            if sys.argv[1] == 'compile':
+            if compile_structures == True:
                 os.system("molsimplify -i " + core + "/" + "/mol_files/" + str(structure_count) + ".mol")
                 os.system("cp " + core + "/" + "/runs/*/*/*.xyz" + \
                           " " + core + "/" + "/xyz/" + str(structure_count) + ".xyz")
                 os.system("rm -r " + core + "/" + "/runs/*")
 
-            else:
-                pass
+
 
             structure_count += 1
             sub_count += 1
@@ -170,7 +195,10 @@ def COREMOD(core, core_mod, mod_dict, param_dict):
     print ("%s \ttotal structures generated" %(structure_count))
 
 
-    return
+    if compile_structures == True:
+        sys.exit()
+    else:
+        return
 
 
 if __name__ == "__main__":
@@ -180,14 +208,20 @@ if __name__ == "__main__":
                    'nickelporphyrin2': {'Symmetric Hs': [[9, 10], [17, 18], [24, 25]], 'Non-Symmetric Hs': [30, 31]}
                    }
 
-    mod_dict    = {'Modifications': ['f', 'cl', 'br', 'i'], 'Number of Substitutions': [1, 2, 3, 4, 5]}
+    mod_dict    = {'Modifications': ['f', 'cl', 'br', 'i'], 'Number of Substitutions': [1]}
 
     param_dict = {'geometry': 'sqp'}
 
     for core, core_mod in core_dict.items():
-        print (core)
 
         if not os.path.exists(core):
             os.mkdir(core)
 
         COREMOD(core, core_mod, mod_dict, param_dict)
+
+
+
+
+
+
+

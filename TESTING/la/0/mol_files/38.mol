@@ -1,0 +1,7 @@
+-core la
+-rundir la/0/runs/
+-lig acac 
+-ligocc 3 
+-decoration [f,f] 
+-decoration_index [11,14] 
+-geometry oct

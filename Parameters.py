@@ -44,8 +44,9 @@ def PARAM(param_dict):
         print (" \n 1 - Add parameter\
                 \n 2 - Show list of added parameters\
                 \n 3 - Show list of available parameters\
-                \n 4 - Remove a modification\
-                \n 5 - Go Back \n\n")
+                \n 4 - Show list of available geometries\
+                \n 5 - Remove a modification\
+                \n 6 - Go Back \n\n")
 
         choice = Input()
 
@@ -85,6 +86,20 @@ def PARAM(param_dict):
 
 
         elif choice == '4':
+            try:
+                print ()
+                print (" Available geometries: \n\n")
+                with open(molsim + "Data/coordinations.dict" , 'r') as f:
+                    ff = f.readlines()
+                    for j in ff:
+                        print (j)
+                print ()
+            except:
+                print (" No coordinations.dict file to display\n")
+
+
+
+        elif choice == '5':
 
             if param_dict == {}:
                 print ("\n No parameters added yet")
@@ -92,18 +107,18 @@ def PARAM(param_dict):
             else:
                 print (" \nList of added parameterss: ")
                 for k, v in param_dict.items():
-                    print (k, v)
+                    print (k, "  -  ", v)
 
                 param_rem = print ("\n\n Which parameter would you like to remove?\n\n")
                 param_rem = Input()
 
-                if mod_rem not in param_dict:
+                if param_rem not in param_dict:
                     print ("\n\n Parameter not found in list of given parameters")
 
                 else:
-                    param_dict.remove(param_rem)
+                    del param_dict[param_rem]
 
-        elif choice == '5':
+        elif choice == '6':
 
             return param_dict
 

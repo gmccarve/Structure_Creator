@@ -1,0 +1,8 @@
+-core nickelporphyrin
+-rundir nickelporphyrin/runs/
+-lig cl f 
+-ligocc 1 1 
+-ccatoms 24,30
+-geometry sqp
+-replig true
+-ffoption no

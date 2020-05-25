@@ -1,37 +1,34 @@
 import sys
 import os
-import numpy as np
-import itertools
 from itertools import combinations_with_replacement
-from itertools import combinations
-from itertools import permutations
+from itertools import product
 from collections import Counter
 
 """
 
     To Do:
-    1 - Figure out a way to reduce redundancies on say two identical methyl groups
-        where a double sub on one methyl is identical to a double sub on the other 
-        methyl
-    2 - Fix higher substitutions with symmetric centers
-        4 subs on ligand with metyl
-    
+    1 - Add reversal for nonsymmetric hydrogens
+        f, br - 8,14 and f, br - 14, 8
+
+
 """
 
-def TEST(lst): 
-      
-    return list(set([i for i in lst]))
-
-
-def LIGMOD(core, ligand_dict, mod_dict, param_dict):
-
-    structure_count = 0
-    sub_counts = []
+def LIGMOD(core, ligand_dict, mod_dict, param_dict, compile_structures, size):
 
     numsub = mod_dict['Number of Substitutions']
     mods   = mod_dict['Modifications']
 
+    temp = []
+    for j in numsub:
+        temp.append(int(j))
+
+    numsub = temp
+
     for envir_num, lig_envir in ligand_dict.items():
+
+        sub_counts = [0 for i in range(max(numsub))]
+
+        structure_count = 0
 
         if not os.path.exists(core + "/" + str(envir_num)):
             os.mkdir(core + "/" + str(envir_num))
@@ -48,9 +45,8 @@ def LIGMOD(core, ligand_dict, mod_dict, param_dict):
             for kk, vv in k.items():
                 ligands.append(kk)
                 for kkk, vvv in vv.items():
-                    if kkk == 'Number of Ligands':
+                    if kkk == 'Ligand Frequency':
                         ligoccu.append(vvv)
-
 
         all_H    = []
         sym_H    = []
@@ -109,8 +105,11 @@ def LIGMOD(core, ligand_dict, mod_dict, param_dict):
             record = []
 
             for jj in range(3):
-                for jjj in range(len(all_H)):
-                    temp = h_s[jj][jjj] 
+                for jjj in range(len(ligands)):
+                    try:
+                        temp = h_s[jj][jjj] 
+                    except:
+                        temp = []
                     if temp != []:
                         for k in temp:
                             temp_ = []
@@ -123,9 +122,13 @@ def LIGMOD(core, ligand_dict, mod_dict, param_dict):
                             else:
                                 record.append([jjj, [k]])
 
-
-            mod_perm = list(combinations_with_replacement(mods, i))
             ind_perm = list(combinations_with_replacement(record, i))
+
+            if size == 'large':
+                mod_perm = list(product(mods, repeat=i))
+
+            elif size == 'small':
+                mod_perm = list(combinations_with_replacement(mods, i))
 
             temp = []
             for j in ind_perm:
@@ -167,7 +170,7 @@ def LIGMOD(core, ligand_dict, mod_dict, param_dict):
                     k_jj = [k, jj]
                     if k_jj not in unique:
                         unique.append(k_jj)
-
+            
             for j in unique:
                 sub = j[0]
                 ind = j[1]
@@ -236,7 +239,7 @@ def LIGMOD(core, ligand_dict, mod_dict, param_dict):
                             sub_txt += str(ind[jj][1][0]) + " "
 
 
-                    f.write(mod_txt + "\tfor ligands " + lig_txt + "\ton sites " + sub_txt + "\n")
+                    f.write(str(structure_count) + " - " + mod_txt + "\tfor ligands " + lig_txt + "\ton sites " + sub_txt + "\n")
 
                 with open(core + "/" + str(envir_num) + "/mol_files/" + str(structure_count) + ".mol", "w") as f:
 
@@ -259,11 +262,11 @@ def LIGMOD(core, ligand_dict, mod_dict, param_dict):
 
                     for jj in range(len(num_for_file)):
                         if num_for_file[jj] != '':
-                            f.write(num_for_file[jj] + " ")
+                            f.write(str(num_for_file[jj]) + " ")
 
                     for jj in range(len(num_for_file)):
                         if num_for_file[jj] == '':
-                            f.write(ligoccu[jj] + " ")
+                            f.write(str(ligoccu[jj]) + " ")
 
                     f.write("\n")
 
@@ -300,30 +303,36 @@ def LIGMOD(core, ligand_dict, mod_dict, param_dict):
                     for k, v in param_dict.items():
                         f.write("-" + str(k) + " " + str(v) + "\n")
 
-                #os.system("molsimplify -i " + core + "/" + str(envir_num) + "/mol_files/" + str(structure_count) + ".mol")
-                #os.system("cp " + core + "/" +  str(envir_num) + "/runs/*/*/*.xyz" + \
-                #                " " + core + "/" + str(envir_num) + "/xyz/" + str(structure_count) + ".xyz")
-                #os.system("rm -r " + core + "/" + str(envir_num) + "/runs/*")
+
+                if compile_structures == True:
+
+                    os.system("molsimplify -i " + core + "/" + str(envir_num) + "/mol_files/" + str(structure_count) + ".mol")
+                    os.system("cp " + core + "/" +  str(envir_num) + "/runs/*/*/*.xyz" + \
+                              " " + core + "/" + str(envir_num) + "/xyz/" + str(structure_count) + ".xyz")
+                    os.system("rm -r " + core + "/" + str(envir_num) + "/runs/*")
                 
-                #os.system("cat " + core + "/" + str(envir_num) + "/mol_files/" + str(sub_count) + ".mol; echo")
 
                 structure_count += 1
                 sub_count += 1
 
-
-            sub_counts.append(sub_count)
+            
+            sub_counts[i-1] = sub_count
 
             with open(core + "/" + str(envir_num) + "/Structures", "a+") as f:
                 f.write("\n%s structures created using %s substitutions" %(sub_count, i))
                 f.write("\n\n")
 
-    for j in range(len(numsub)):
-        print ("%s \ttotal structures generated with %s substitutions" %(sub_counts[j], j))
+    print ("CORE :", core)
+    for j in numsub:
+        print ("%s \ttotal structures generated with %s substitutions" %(sub_counts[j-1], j))
 
     print ("%s \ttotal structures generated" %(structure_count))
 
-    
-    return
+    if compile_structures == True:
+        sys.exit()
+
+    else:
+        return
 
 
 
@@ -333,32 +342,27 @@ if __name__ == "__main__":
 
     if sys.argv[1] == 'long':
         ligand_dict = {0:
-                     [{'acac': {'Number of Ligands': '1', 'Symmetric Hs': [[8, 9, 10], [11, 12, 13]], 'Non-Symmetric Hs': [14]}},
-                      {'acac': {'Number of Ligands': '1', 'Symmetric Hs': [[8, 9, 10], [11, 12, 13]], 'Non-Symmetric Hs': [14]}}, 
-                      {'acac': {'Number of Ligands': '1', 'Symmetric Hs': [[8, 9, 10], [11, 12, 13]], 'Non-Symmetric Hs': [14]}}]
-                    }
-
-    elif sys.argv[1] == 'short':
-
+                      [{'acac': {'Ligand Frequency': '1', 'Symmetric Hs': [[8, 9, 10], [11, 12, 13]], 'Non-Symmetric Hs': [14]},
+                        'no3': {'Ligand Frequency': '2'}}],
+                       1:
+                      [{'acac': {'Ligand Frequency': '2', 'Symmetric Hs': [[8, 9, 10], [11, 12, 13]], 'Non-Symmetric Hs': [14]},
+                        'no3': {'Ligand Frequency': '1'}}],
+                       2:
+                      [{'acac': {'Ligand Frequency': '3', 'Symmetric Hs': [[8, 9, 10], [11, 12, 13]], 'Non-Symmetric Hs': [14]}}]
+                  }
+    elif sys.argv[1] == 'all':
         ligand_dict = {0:
-                     [{'acac': {'Number of Ligands': '3', 'Symmetric Hs': [[8, 9, 10], [11, 12, 13]], 'Non-Symmetric Hs': [14]}}]
-                      }
+                [{'acac': {'Ligand Frequency': '3', 'Symmetric Hs': [[8, 9, 10]], 'Non-Symmetric Hs':[14]}}]}
 
-    elif sys.argv[1] == 'test':
-
-        ligand_dict = {0:
-                     [{'acac': {'Number of Ligands': '2', 'All Hs': [8, 9, 10, 11, 12, 13, 14]}},
-                      {'no3' : {'Number of Ligands': '1'}}]
-                     }
 
 
     core        = 'la'
 
-    mod_dict    = {'Modifications': ['f', 'cl', 'br'], 'Number of Substitutions': [1, 2, 3]}
+    mod_dict    = {'Modifications': ['f', 'cl', 'br'], 'Number of Substitutions': [3]}
 
     param_dict = {'geometry': 'oct'}
 
     if not os.path.exists(core):
             os.mkdir(core)
 
-    LIGMOD(core, ligand_dict, mod_dict, param_dict)
+    LIGMOD(core, ligand_dict, mod_dict, param_dict, False, 'large')

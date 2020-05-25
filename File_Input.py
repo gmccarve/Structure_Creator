@@ -1,6 +1,7 @@
 import os
 import sys
 import itertools
+from Comp import COMP
 
 
 def FILE_INPUT(input_file):
@@ -436,7 +437,6 @@ def FILE_INPUT(input_file):
     choice = input(" > ")
 
     if choice.lower() == 'compile':
-        return ligand_dict, core_dict, mod_dict, param_dict
         COMP(ligand_dict, core_dict, mod_dict, param_dict)
 
     elif choice.lower() == 'print':
@@ -467,6 +467,8 @@ def FILE_INPUT(input_file):
         for k, v in param_dict.items():
             print (k, v)
         print ()
+
+        return
 
     return
 

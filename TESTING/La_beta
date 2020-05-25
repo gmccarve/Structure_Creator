@@ -1,0 +1,55 @@
+%core la
+end
+
+%core gd
+end
+
+%core lu
+end
+
+%ligand acac
+environment 0
+ligocc 3
+#symmetric [8 9 10]
+nonsymmetric 8 14
+end
+
+%param
+geometry oct
+keephs yes
+coord 6
+spin 1
+distort 0
+replig true
+keepHs true
+ligalign true
+end
+
+%mod
+numsub 2
+f
+cl
+br
+water
+bz
+butoxy
+butyl
+cf3
+ethoxy
+ethyl
+methoxy
+methyl
+nc1c1
+nc2c2
+nc3c3
+nc4c4
+nh2
+nhc1
+nhc2
+nhc3
+nhc4
+pentyl
+propoxy
+propyl
+water
+end

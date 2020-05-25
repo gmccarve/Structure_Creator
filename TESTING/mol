@@ -1,0 +1,9 @@
+-core calixarene
+-rundir .
+-lig cl cl
+-ligocc 1 1
+-ccatoms 40, 41
+-replig true
+-keephs true
+-ffoption no
+

@@ -7,9 +7,6 @@ from Mod import MOD
 from Parameters import PARAM
 from Comp import COMP
 
-#TODO Add core symmetric [[], []]]
-
-
 def MENU():
 
     def Input():
@@ -61,16 +58,23 @@ def MENU():
 
         elif choice == '5':
             if mod_dict == {}:
-                print ("\n\nNo modifications added. Structures can still be compiled, however.")
-                print ("Would you like to [add] modifications or [compile]?")
+                print ("\n\nNo modifications added.")
+                print ("Would you like to [add] modifications, try to [compile] as is, or go [back]?")
 
                 choice_ = Input()
 
                 if choice_ == 'add':
                     mod_dict = MOD(mod_dict)
+                    COMP(ligand_dict, core_dict, mod_dict, param_dict)
 
                 elif choice_ == 'compile':
                     COMP(ligand_dict, core_dict, mod_dict, param_dict)
+
+                elif choice_ == 'back':
+                    pass
+
+                else:
+                    pass
 
             else:
                 COMP(ligand_dict, core_dict, mod_dict, param_dict)

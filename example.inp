@@ -34,6 +34,8 @@ end
 #		will be added if the all keyword is included. 
 #		These hydrogens must be separated by spaces
 #	- end to close this core
+#
+#	NOTE - When modifying a core, any information given as a %ligand block is ignored
 
 %core nickelporphryin
 symmetric [1 2 3]

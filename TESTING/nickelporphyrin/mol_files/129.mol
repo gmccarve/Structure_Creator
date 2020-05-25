@@ -1,0 +1,13 @@
+-core nickelporphyrin
+-rundir nickelporphyrin/runs/
+-lig cl br 
+-ligocc 1 1 
+-ccatoms 18,30
+-geometry sqp
+-keephs yes
+-coord 4
+-distort 0
+-replig true
+-keepHs true
+-ligalign true
+-ffoption no

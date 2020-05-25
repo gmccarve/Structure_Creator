@@ -1,9 +1,5 @@
 import os
 
-    #TODO Ensure ability to work with non-atom based cores
-    #TODO Add symmetry
-
-
 def CORE(core_dict):
 
     def Input():
@@ -57,16 +53,16 @@ def CORE(core_dict):
                     temp_ = str(lines[3])
                     while temp_.startswith(" "):
                         temp_ = temp_[1:]
-                    Num_atoms = int(lines[3].split(" ")[1])
+                    Num_atoms = int(temp_.split(" ")[0])
                     del lines[:4]
                 elif END == '.xyz':
-                    Num_atoms = int(lines[1])
+                    Num_atoms = int(lines[0])
                     del lines[:2]
                 for line in lines:
                     if count < Num_atoms:
                         for j in line.split(" "):
                             if j.lower() == 'h':
-                                core_dict[core]['All Hs'].append(count)
+                                core_dict[core]['All Hs'].append(count+1)
                         count += 1
 
             return
@@ -80,6 +76,7 @@ def CORE(core_dict):
                     \n Type 'skip' to skip\n\n")
             
             symmetric_hs = Input()
+            
             
             if symmetric_hs != 'skip':
 
@@ -164,13 +161,13 @@ def CORE(core_dict):
                 if y_n == 'y':
                     print ("\n Enter location of file \n\n > ")
 
-                    core_location = Input()
+                    core_location = input()
 
                     add_core_file = core_location.split("/")[-1]
 
-                    print ("\n Enter connection atom(s) index separated by commas\n\n")
+                    print ("\n Enter connection atom(s)\n\n")
 
-                    con_atom = str("[" + Input() + "]")
+                    con_atom = Input()
 
                     print (" Enter maximum denticity \n\n")
 
@@ -186,6 +183,9 @@ def CORE(core_dict):
                     core_dict[core] = {}
                     END = core_location[-4:]
 
+                else:
+                    pass
+
             try:
                 with open(MolSim + "Cores/" + core_location) as f:
                     for i, l in enumerate(f):
@@ -195,7 +195,7 @@ def CORE(core_dict):
                 core_len = 0
 
 
-            if core_len > 2:
+            if core_len > 3:
 
                 show_mod = '1'
 
@@ -230,7 +230,7 @@ def CORE(core_dict):
                     print (" ", k)
 
                     for kk, vv in v.items():
-                        print (" ", kk," - ", vv)
+                        print ("\t", kk," - ", vv)
 
                     print ()
 
@@ -241,6 +241,7 @@ def CORE(core_dict):
                 print ("\n Which core would you like to display?\n")
                 for k, v, in core_dict.items():
                     print ("  - " + str(k))
+                print ()
 
                 core = Input()
 
@@ -261,7 +262,7 @@ def CORE(core_dict):
 
                     except:
                         print (" \n No file associated with that core.")
-                        print (" Core still found in dictionary file, though.\n")
+                        #print (" Core still found in dictionary file, though.\n")
 
 
 

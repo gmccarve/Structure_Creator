@@ -1,0 +1,21 @@
+%core nickelporphyrin
+symmetric [9 10] [24 25]
+nonsymmetric 17 18 30 31
+end
+
+%param
+geometry sqp
+keephs yes
+coord 4
+distort 0
+replig true
+keepHs true
+ligalign true
+end
+
+%mod
+numsub 2
+f
+cl
+br
+end

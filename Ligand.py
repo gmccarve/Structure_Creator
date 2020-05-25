@@ -1,12 +1,5 @@
 import os
 
-""" 
-
-    To Do:
-
-
-"""
-
 def LIGAND(ligand_dict):
 
     def Input():
@@ -44,9 +37,9 @@ def LIGAND(ligand_dict):
 
     def ADD(temp_lig_dict, ligand):
         print ("\n\n Which atoms (if any) would you like to modify for this ligand?\
-                   \nType 'all' to modify all hydrogens, \
-                   \n      'none' to modify no hydrogens, or\
-                   \n      'manual' to add hydrogens by index\n\n")
+                  \n Type 'all' to modify all hydrogens, \
+                  \n      'none' to modify no hydrogens, or\
+                  \n      'manual' to add hydrogens by index\n\n")
 
         ligand_mod = Input()
 
@@ -114,7 +107,8 @@ def LIGAND(ligand_dict):
                 temp_lig_dict[ligand]['Symmetric Hs'] = symmetric_hs
 
 
-            print ("\n Type the indices of any non-symmetric hydrogens or 'skip' to skip\n\n")
+            print ("\n Type the indices of any non-symmetric hydrogens.\
+                    \n Type 'skip' to skip\n\n")
 
             nonsymmetric_hs = Input()
 
@@ -141,6 +135,8 @@ def LIGAND(ligand_dict):
                 for kkk, vvv in kk.items():
                     print (" ", kkk, " - ", vvv)
                     print ()
+
+        print (" ____________________________")
 
         print ("\n Which environment would you like to add this ligand to?")
         print ("\n Or type 'new' to add a new environment\n")
@@ -181,6 +177,8 @@ def LIGAND(ligand_dict):
 
             else:
 
+                #TODO make sure and fix after deleting environment or move keys down accordingly
+
                 envir_test = Add_Envir(ligand_dict)
 
                 try:
@@ -213,19 +211,21 @@ def LIGAND(ligand_dict):
 
             ligand = str(Input())
             
-            print ("\n How many of this ligand would you like to add? \n")
-            
-            num_lig = int(Input())
-            
             temp = check_ligand(ligand, ligand_file)
 
             if temp[0] == True:
-                print (" Ligand found\n")
+                print (" Ligand found")
 
                 temp_lig_dict[ligand] = {}
-                temp_lig_dict[ligand]['Ligand Frequency'] = num_lig
                 ligand_location = str(temp[1].split(",")[0].split(":")[1])
                 END = ligand_location[-4:]
+
+                print ("\n How many of this ligand would you like to add? \n")
+
+                num_lig = int(Input())
+
+                temp_lig_dict[ligand]['Ligand Frequency'] = num_lig
+
 
             
             else:
@@ -294,6 +294,9 @@ def LIGAND(ligand_dict):
                     else:
                         pass
 
+            else:
+                print ("\n\nNo ligand file available to display\n")
+
             ligand_dict[envir].append(temp_lig_dict)
 
         
@@ -308,7 +311,7 @@ def LIGAND(ligand_dict):
                     print (" \n List of added ligands: \n\n")
                     for kk in v:
                         for kkk, vvv in kk.items():
-                            print (" ", kkk, " - ", vvv)
+                            print (" ", kkk, "  -  ", vvv)
                             print ()
 
 
@@ -316,15 +319,15 @@ def LIGAND(ligand_dict):
             if ligand_dict == {}:
                 print ("\ n No ligands added yet")
             else:
-                print ("\n List of Ligand Environments")
-                print (" ____________________________")
+                temp_list = []
                 for k, v in ligand_dict.items():
-                    print ("\n Ligand Environment : " + str(k))
-                    print (" \n List of added ligands: \n\n")
                     for kk in v:
                         for kkk, vvv in kk.items():
-                            print (" ", kkk, " - ", vvv)
-                            print ()
+                            if kkk not in temp_list:
+                                temp_list.append(kkk)
+                print(" \n List of added ligands: \n\n")
+                for k in temp_list:
+                    print (" - ", k)
 
 
                 print ("\n Which ligand would you like to display?\n")
@@ -338,14 +341,10 @@ def LIGAND(ligand_dict):
 
                 lig_test = True
 
-                for k, v in ligand_dict.items():
-                    for kk in v:
-                        if ligand not in kk:
-                            print ("\n Ligand not found")
-                            lig_test = False
-                            pass
+                if ligand not in temp_list:
+                    print ("\n Ligand not found")
 
-                if lig_test == True:
+                else:
                     try:
                         with open(MolSim + "Ligands/" + ligand_file_temp) as f:
                             for j in f:
@@ -354,7 +353,6 @@ def LIGAND(ligand_dict):
 
                     except:
                         print (" \n No file associated with that ligand.")
-                        print (" Ligand still found in dictionary file, though.\n")
 
 
 
