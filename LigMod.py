@@ -4,14 +4,7 @@ from itertools import combinations_with_replacement
 from itertools import product
 from collections import Counter
 
-"""
-
-    To Do:
-    1 - Add reversal for nonsymmetric hydrogens
-        f, br - 8,14 and f, br - 14, 8
-
-
-"""
+#TODO Add option to have constant modification (CF3 on a beta arm)
 
 def LIGMOD(core, ligand_dict, mod_dict, param_dict, compile_structures, size):
 
@@ -200,7 +193,7 @@ def LIGMOD(core, ligand_dict, mod_dict, param_dict, compile_structures, size):
                 for k, v in temp.items():
                     temp_ = []
                     for jj in range(v):
-                        temp_.append(sub[sub_counter:sub_counter+v][0])
+                        temp_.append(sub[sub_counter:sub_counter+v][jj])
                     sub_for_file.append(temp_)
                     sub_counter += v
 
@@ -350,19 +343,19 @@ if __name__ == "__main__":
                        2:
                       [{'acac': {'Ligand Frequency': '3', 'Symmetric Hs': [[8, 9, 10], [11, 12, 13]], 'Non-Symmetric Hs': [14]}}]
                   }
-    elif sys.argv[1] == 'all':
+    elif sys.argv[1] == 'short':
         ligand_dict = {0:
-                [{'acac': {'Ligand Frequency': '3', 'Symmetric Hs': [[8, 9, 10]], 'Non-Symmetric Hs':[14]}}]}
+                [{'acac': {'Ligand Frequency': 1, 'Non-Symmetric Hs':[8, 9]}}]}
 
 
 
     core        = 'la'
 
-    mod_dict    = {'Modifications': ['f', 'cl', 'br'], 'Number of Substitutions': [3]}
+    mod_dict    = {'Modifications': ['f', 'cl', 'br'], 'Number of Substitutions': [2]}
 
-    param_dict = {'geometry': 'oct'}
+    param_dict = {'geometry': 'tpl'}
 
     if not os.path.exists(core):
             os.mkdir(core)
 
-    LIGMOD(core, ligand_dict, mod_dict, param_dict, False, 'large')
+    LIGMOD(core, ligand_dict, mod_dict, param_dict, False, 'small')
