@@ -4,6 +4,8 @@ import itertools
 from LigMod import LIGMOD
 from CoreMod import COREMOD
 
+#TODO check error from too many mods and not enough sites
+
 def COMP(ligand_dict, core_dict, mod_dict, param_dict):
 
     def Input():
@@ -63,11 +65,10 @@ def COMP(ligand_dict, core_dict, mod_dict, param_dict):
 
     num_atoms = num_core_atoms + num_lig_atoms
 
-    if len(mod_dict['Number of Substitutions']) > num_atoms:
-        print ("\n\n ERROR. Too many substitutions and not enough atoms to modify\
-                  \n Changing number of substitutions to match number of given\
-                  \n modifications")
-        mod_dict['Number of Substitutions'] = num_atoms
+    for j in mod_dict['Number of Substitutions']:
+        if int(j) > num_atoms:  
+            print ("\n\n ERROR. Too many substitutions and not enough atoms to modify")
+            sys.exit()
 
     print ("\n\n Do you want to display the number of structures that would be created? (y/n)\n")
     choice = Input()
@@ -103,7 +104,7 @@ def COMP(ligand_dict, core_dict, mod_dict, param_dict):
 if __name__ == '__main__':
 
 
-    ligand_dict = {0: [{'acac': {'Ligand Frequency': '3', 'Symmetric Hs': [[8, 9, 10], [11, 12, 13]], 'Non-Symmetric Hs': [14]}}]}
+    ligand_dict = {0: [{'acac': {'Ligand Frequency': '3', 'Symmetric Hs': [], 'Non-Symmetric Hs': [14]}}]}
 
     core_dict   = {'la': {},
                    'gd': {},
