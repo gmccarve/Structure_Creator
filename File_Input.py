@@ -5,13 +5,20 @@ from Comp import COMP
 
 
 def FILE_INPUT(input_file):
+    # Program to read in a given input file. Adds information given in the input file
+    # into the appropriate dictionary.
 
     def Find_Molsim():
+        # Find the location of the molsimplify folder. 
+        # Necessary to add cores, ligands, or modifications
+
         for root, dir, files in os.walk(os.path.expanduser('~')):
             if 'cores.dict' in files:
                 return str(root)[:-5]
 
     def CheckInt(val, line, line_num):
+        # Check to see if given value(s) is an integer
+        
         if type(val) == list:
             if any(isinstance(el, list) for el in val):
                 val = list(itertools.chain(*val))
@@ -23,12 +30,28 @@ def FILE_INPUT(input_file):
                 sys.exit()
 
     def CheckFile(check_file, line, line_num):
+        # Check to see if file exsists. 
+        # Necessary to add cores, ligands, or modifications
+
         if os.path.exists(check_file):
             pass
         else:
             print ("FILE %s ON LINE %s NOT FOUND" %(check_file, line_num))
             sys.exit()
 
+    def Input():
+        # Sanitizes the user input by removing leading and trailing spaces
+        # and removes multiple spaces
+
+        x = input(" > ").lower()
+
+        while x == '':
+            x = str(input("\033[A > ")).lower()
+        while x.endswith(" ") == True:
+            x = x[:-1]
+        while x.startswith(" ") == True:
+            x = x[1:]
+        return x
 
 
     core_dict   = {}
@@ -36,7 +59,7 @@ def FILE_INPUT(input_file):
     mod_dict    = {}
     param_dict  = {}
 
-    runcheck = False
+    # Find molsimplify folder, read in input, and remove commented lines
 
     molsim = Find_Molsim()
 
@@ -46,6 +69,9 @@ def FILE_INPUT(input_file):
     for j in ff:
         if j.startswith("#"):
             ff.remove(j)
+
+    # Sanitize the input information by removing newline characters (\n), 
+    # leading and trailing spaces, and any extra spaces
 
     count = 0
     for j in ff:
@@ -62,6 +88,9 @@ def FILE_INPUT(input_file):
             ff[count] = ff[count].replace("  ", " ")
 
         count += 1
+
+    # Iterate through input list and then check if line starts with "%" which denotes a 
+    # core, ligand, modificaiton, or parameter block
 
     for j in range(len(ff)):
         line = str(ff[j])
@@ -83,6 +112,8 @@ def FILE_INPUT(input_file):
 
                     count += 1
 
+                # Used to add cores
+
                 CORE_FILE, CON_ATOM, MAX_DENT = False, False, False
 
                 for jj in temp:
@@ -93,6 +124,9 @@ def FILE_INPUT(input_file):
                     jj = sep.join(temp_)
 
                     j_low = jj.lower()
+
+                    # Determine the value of the specific line.
+                    # If that value is a list, then it is handled differently
 
                     if "[" not in j_low or "]" not in j_low:
                         j_val = jj.lower().split(" ")[1:]
@@ -144,6 +178,10 @@ def FILE_INPUT(input_file):
                         sys.exit()
 
                 if CORE_FILE == True and CON_ATOM == True and MAX_DENT == True:
+                    # All checks have passed to add a core to the molsimplify program 
+                    # Copy the xyz/mol file to the Cores folder, 
+                    # Check to see if core information is already in cores.dict file
+
 
                     if os.path.exists(molsim + "Cores/" + add_core_file):
                         pass
@@ -163,6 +201,8 @@ def FILE_INPUT(input_file):
                             fle.write(core + ":" + add_core_file + "," + add_con_atom + "," + add_max_dent + "\n")
                             print ("\n\nCore %s added successfully. Use at your own risk." %core)
 
+                # Checks to see hydrogen lists have been created/populated
+
                 try:
                     core_dict[core]['All Hs']
                     allH = True
@@ -181,7 +221,8 @@ def FILE_INPUT(input_file):
                 except:
                     nonsymH = False
 
-                if allH == True and symH == True and nonsymH == True or allH == True and symH == True and nonsymH == False:
+                if allH == True and symH == True:
+                    # Removes instances from 'All Hs' if already in 'Symmetric Hs' or 'Non-Symmetric Hs'
 
                     for i in list(itertools.chain(*core_dict[core]['Symmetric Hs'])):
                         if i in core_dict[core]['All Hs']:
@@ -191,8 +232,10 @@ def FILE_INPUT(input_file):
                         if i not in core_dict[core]['Non-Symmetric Hs']:
                             core_dict[core]['Non-Symmetric Hs'].append(i)
 
-                    core_dict[core]['Non-Symmetric Hs'] = core_dict[core]['All Hs']
                     del core_dict[core]['All Hs']
+
+                # Add lists if not given from input
+                # Necessary for down the line
 
                 elif symH == True and nonsymH == False:
                     core_dict[core]['Non-Symmetric Hs'] = []
@@ -205,17 +248,13 @@ def FILE_INPUT(input_file):
                     core_dict[core]['Non-Symmetric Hs'] = []
 
                 if symH == True and len(list(itertools.chain(*core_dict[core]['Symmetric Hs']))) == 1:
-                    print ("There must be more than one symmetric substitution sites for cores. \
-                          \nMoving to non-symmeric dictionary")
+                    print (" There must be more than one symmetric substitution sites for cores. \
+                          \n Moving to non-symmeric dictionary")
 
-                    temp = []
-                    for jj in core_dict[core]['Symmetric Hs']:
-                        temp.append(jj)
-                    if len(core_dict[core]['Non-Symmetric Hs']) != 0:
-                        for jj in core_dict[core]['Non-Symmetric Hs']:
-                            temp.append(jj)
+                    temp = list(itertools.chain(*core_dict[core]['Symmetric Hs']))
+                    for jj in temp:
+                        core_dict[core]['Non-Symmetric Hs'].append(jj)
 
-                    core_dict[core]['Non-Symmetric Hs']  = temp
                     core_dict[core]['Symmetric Hs'] = []
 
             elif item.startswith('ligand'):
@@ -234,10 +273,16 @@ def FILE_INPUT(input_file):
 
                     count += 1
 
+                # Used to add ligands
+
                 ADD_LIG, CON_ATOM = False, False
 
                 for jj in temp:
                     j_low = jj.lower()
+
+                    # Determine the value of the specific line.
+                    # If that value is a list, then it is handled differently
+
                     if "[" not in j_low or "]" not in j_low:
                         j_val = jj.lower().split(" ")[1:]
                     else:
@@ -295,11 +340,16 @@ def FILE_INPUT(input_file):
                     temp_lig_dict[ligand]['Ligand Frequency'] = 1
 
                 if ADD_LIG == True and CON_ATOM == True:
+                    # All checks have passed to add a ligand to the molsimplify program
+                    # Copy the xyz/mol file to the ligand folder,
+                    # and run the molsimplify 'ligadd' command to add the ligand
 
                     os.system("molsimplify -ligadd " + add_lig_file + " -ligname " + ligand + " -ligcon " + add_con_atom )
                     os.system("cp " + add_lig_file + " " + molsim + "Ligands/" + add_lig_file)
 
                     print ("\n\nLigand added successfully. Use at your own risk")
+
+                # Checks to see hydrogen lists have been created/populated
 
                 try:
                     temp_lig_dict[ligand]['All Hs']
@@ -320,6 +370,7 @@ def FILE_INPUT(input_file):
                     nonsymH = False
 
                 if allH == True and symH == True:
+                    # Removes instances from 'All Hs' if already in 'Symmetric Hs' or 'Non-Symmetric Hs'
 
                     for i in list(itertools.chain(*temp_lig_dict[ligand]['Symmetric Hs'])):
                         if i in temp_lig_dict[ligand]['All Hs']:
@@ -330,6 +381,9 @@ def FILE_INPUT(input_file):
                             temp_lig_dict[ligand]['Non-Symmetric Hs'].append(i)
 
                     del temp_lig_dict[ligand]['All Hs']
+
+                # Add lists if not given from input
+                # Necessary for down the line
 
                 elif symH == True and nonsymH == False:
                     temp_lig_dict[ligand]['Non-Symmetric Hs'] = []
@@ -345,18 +399,16 @@ def FILE_INPUT(input_file):
                     print ("There must be more than one symmetric substitution sites for ligands. \
                             \nMoving to non-symmeric dictionary")
                     
-                    temp = []
-                    for jj in temp_lig_dict[ligand]['Symmetric Hs']:
-                        temp.append(jj)
+                    temp = list(itertools.chain(*temp_lig_dict[ligand]['Symmetric Hs']))
+                    for jj in temp:
+                        temp_lig_dict[ligand]['Non-Symmetric Hs'].append(jj)
 
-                    if len(temp_lig_dict[ligand]['Non-Symmetric Hs']) != 0:
-                        for jj in temp_lig_dict[ligand]['Non-Symmetric Hs']:
-                            temp.append(jj)
-
-                    temp_lig_dict[ligand]['Non-Symmetric Hs']  = temp
                     temp_lig_dict[ligand]['Symmetric Hs'] = []
 
                 try:
+                    # Check to see if ligand environment value is given in the input
+                    # Program quits if not given for all ligands
+
                     lig_envir
                 except:
                     print ("Input file read unsucessfully")
@@ -364,6 +416,10 @@ def FILE_INPUT(input_file):
                     sys.exit()
 
                 try:
+                    # Check to see if ligand environemnt already in ligand dictionary.
+                    # If not, then an empty list is created for the environment. 
+                    # The temporary ligand information is then appended to that environment
+
                     ligand_dict[lig_envir]
                 except:
                     ligand_dict[lig_envir] = []
@@ -376,8 +432,6 @@ def FILE_INPUT(input_file):
 
                 add_mod_file = []
                 add_con_atom = []
-
-                ADD_MOD, CON_ATOM = False, False
 
                 while ff[j+count].startswith('end') == False:
                     jj = ff[j+count]
@@ -434,12 +488,13 @@ def FILE_INPUT(input_file):
 
     print ("\n\nInput file read successfully.")
     print ("Would you like to [compile] or [print] the necessary dictionaries?\n")
-    choice = input(" > ")
+    
+    choice = Input()
 
-    if choice.lower() == 'compile':
+    if choice == 'compile':
         COMP(ligand_dict, core_dict, mod_dict, param_dict)
 
-    elif choice.lower() == 'print':
+    elif choice == 'print':
 
         print ("________________________")
         print ("Cores:\n")

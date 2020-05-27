@@ -8,8 +8,16 @@ from Parameters import PARAM
 from Comp import COMP
 
 def MENU():
+    # Commandline menu to add information to the 4 possible dictionaries:
+    #   Cores
+    #   Ligands
+    #   Modifications
+    #   Parameters
+    # Each dictionary is modified by it's own program and then brought back to this program
 
     def Input():
+        # Sanitizes the user input by removing leading and trailing spaces
+        # and removes multiple spaces
 
         x = input(" > ").lower()
 
@@ -42,7 +50,6 @@ def MENU():
                   \n 7 - Exit\n")
 
         choice = Input()
-
 
         if choice == '1':
             core_dict = CORE(core_dict)

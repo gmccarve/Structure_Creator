@@ -8,9 +8,13 @@ from Menu import MENU
 
 
 def clear():
+    # Clears the terminal screen
+
     os.system('clear')
 
 def Input():
+    # Sanitizes the user input by removing leading and trailing spaces
+    # and removes multiple spaces
 
     x = input(" > ")
 
@@ -23,18 +27,15 @@ def Input():
     return re.sub(" +", " ", x)
 
 def check_molsimplify():
+    # Checks to see if .molsimplify is available. 
+    # If not, then it is assumed that molsimplify
+    # has not been installed and the program quits. 
+
     for f in os.listdir(os.path.expanduser('~')):
         if f == '.molSimplify':
             return True
 
     return False
-
-def molsimplify_conda_env():
-
-    os.system("source activate molSimplify")
-    os.system("conda install -c hjkgroup molSimplify")
-
-    return
 
 if __name__ == "__main__":
 
@@ -46,19 +47,22 @@ if __name__ == "__main__":
 
     OS = platform.system()
 
-    #molsimplify_conda_env()
+    clear()
+
+    print (" Welcome to the Structure Creator Code V 3.0\
+        \n\n This code is able to create modified structures\
+          \n that can be used for quantum chemical calculations.\n")
+
+    # Check to see if input file is given and if so, reads in the 
+    # input data
+
 
     if len(sys.argv[1:]) > 0:
         if sys.argv[1] == '-f':
             FILE_INPUT(sys.argv[2])
             sys.exit()
 
-    clear()
-
-    print (" Welcome to the Structure Creator Code V 3.0\
-        \n\n This code is able to create modified structures\
-          \n that can be used for quantum chemical calculations.\
-        \n\n To be taken to the commandline menu, simply type\
+    print (" To be taken to the commandline menu, simply type\
           \n [menu]. Otherwise, to read in an input file,\
           \n either excecute this code with a '-f' flag followed by the\
           \n input file or type in the name of the input file\n")
