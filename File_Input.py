@@ -429,6 +429,7 @@ def FILE_INPUT(input_file):
             elif item == 'mod':
                 count = 1
                 temp = []
+                perm = []
 
                 add_mod_file = []
                 add_con_atom = []
@@ -452,6 +453,10 @@ def FILE_INPUT(input_file):
                             temp_ += k + ","
                         add_con_atom.append(str(temp_) + "]")
 
+                    elif ff[j+count].lower().startswith("_"):
+                        mod_ = jj[1:].split(" ")
+                        perm.append(mod_)
+
                     else:
                         temp.append(jj)
                     count += 1
@@ -463,6 +468,7 @@ def FILE_INPUT(input_file):
                         add_con_atom = add_con_atom[:length]
 
                 mod_dict['Modifications'] = temp
+                mod_dict['Permanent']     = perm
 
                 for jj in range(len(add_mod_file)):
                     add_mod  = add_mod_file[jj]

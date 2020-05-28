@@ -38,6 +38,7 @@ def MOD(mod_dict):
     if mod_dict == {}:
         mod_dict['Modifications'] = []
         mod_dict['Number of Substitutions'] = [1]
+        mod_dict['Permanent'] = []
 
     mod_list = mod_dict['Modifications']
     sub_list = mod_dict['Number of Substitutions']
@@ -90,6 +91,24 @@ def MOD(mod_dict):
                 except:
                     print ("\n\n Modification unable to be added")
 
+            print ("\n Would you like this modification to be permanent in all structures (y/n)? \n")
+
+            perm_ = Input()
+
+            if perm_ == 'y':
+                
+                print ("\n Which position would like to modify? \n")
+
+                perm_ind = Input()
+
+                try:
+                    mod_dict['Permanent'].append([mod, perm_ind])
+
+                except:
+                    mod_dict['Permanent'] = []
+                    mod_dict['Permanent'].append([mod, perm_ind])
+
+
             else:
                 if mod not in mod_list:
                     mod_list.append(mod)
@@ -99,9 +118,14 @@ def MOD(mod_dict):
             if mod_list == []:
                 print ("\n No modifications added yet")
             else:
-                print (" \nList of added modifications: ")
+                print (" \n List of added modifications: ")
                 for j in mod_list:
                     print (" - " + str(j))
+                print ()
+
+                print ("\n List of permanent modfications: ")
+                for j in mod_dict['Permanent']:
+                    print (" - " + str(j[0]) + ' : ' + str(j[1]))
                 print ()
 
 
