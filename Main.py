@@ -2,6 +2,7 @@ import os
 import sys
 import platform
 import re
+import time
 
 from File_Input import FILE_INPUT
 from Menu import MENU
@@ -43,6 +44,7 @@ if __name__ == "__main__":
         print (" molSimplify must be installed to use this program.\
               \n Please see https://github.com/hjkgrp/molSimplify \
               \n on how to install molSimplify.")
+        time.sleep(15)
         sys.exit()
 
     OS = platform.system()
