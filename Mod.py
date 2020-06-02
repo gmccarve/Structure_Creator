@@ -115,7 +115,7 @@ def MOD(mod_dict):
 
 
         elif choice == '2':
-            if mod_list == []:
+            if mod_list == [] and mod_dict['Permanent'] == []:
                 print ("\n No modifications added yet")
             else:
                 print (" \n List of added modifications: ")
@@ -200,7 +200,6 @@ def MOD(mod_dict):
 if __name__ == "__main__":
 
     mod_dict = {'Modifications': ['f', 'cl'], 'Number of Substitutions': ['1']}
-    #MOD(mod_dict)
     print (MOD(mod_dict))
 
 

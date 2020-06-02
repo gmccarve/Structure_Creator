@@ -4,12 +4,11 @@ from itertools import combinations_with_replacement
 from itertools import product
 from collections import Counter
 
-#TODO Add option to have constant modification (CF3 on a beta arm)
-
 def LIGMOD(core, ligand_dict, mod_dict, param_dict, compile_structures, size):
 
     numsub = mod_dict['Number of Substitutions']
     mods   = mod_dict['Modifications']
+    perm   = mod_dict['Permanent']
 
     temp = []
     for j in numsub:
@@ -215,7 +214,6 @@ def LIGMOD(core, ligand_dict, mod_dict, param_dict, compile_structures, size):
 
                 ind_for_file = temp
 
-
                 with open(core + "/" + str(envir_num) + "/Structures", "a+") as f:
 
                     mod_txt = ''
@@ -265,31 +263,29 @@ def LIGMOD(core, ligand_dict, mod_dict, param_dict, compile_structures, size):
 
                     f.write("-decoration ")
 
-                    for jj in range(len(sub_for_file)):
-                        if len(sub_for_file[jj]) == 1:
-                            f.write("[" + sub_for_file[jj][0] + "] ")
-                        else:
-                            string =  "["
-                            for jjj in range(len(sub_for_file[jj])):
-                                string += sub_for_file[jj][jjj]
-                                string += ","
-                            string = string[:-1]
-                            f.write(string + "] ")
+                    string =  "["
+                    for jjj in range(len(sub_for_file[jj])):
+                        string += sub_for_file[jj][jjj]
+                        string += ","
+                    for jjj in perm:
+                        string += str(jjj[0])
+                        string += ","
+                    string = string[:-1]
+                    f.write(string+ "] ")
 
                     f.write("\n")
 
                     f.write("-decoration_index ")
 
-                    for jj in range(len(ind_for_file)):
-                        if len(ind_for_file[jj]) == 1:
-                            f.write("[" + str(ind_for_file[jj][0]) + "] ")
-                        else:
-                            string =  "["
-                            for jjj in range(len(ind_for_file[jj])):
-                                string += str(ind_for_file[jj][jjj])
-                                string += ","
-                            string = string[:-1]
-                            f.write(string + "] ")
+                    string =  "["
+                    for jjj in range(len(ind_for_file[jj])):
+                        string += str(ind_for_file[jj][jjj])
+                        string += ","
+                    for jjj in perm:
+                        string += str(jjj[1])
+                        string += ","
+                    string = string[:-1]
+                    f.write(string + "] ")
 
                     f.write("\n")
 
@@ -345,17 +341,16 @@ if __name__ == "__main__":
                   }
     elif sys.argv[1] == 'short':
         ligand_dict = {0:
-                [{'acac': {'Ligand Frequency': 1, 'Non-Symmetric Hs':[8, 9]}}]}
-
+                [{'acac': {'Ligand Frequency': 3, 'Non-Symmetric Hs':[14]}}]}
 
 
     core        = 'la'
 
-    mod_dict    = {'Modifications': ['f', 'cl', 'br'], 'Number of Substitutions': [2]}
+    mod_dict    = {'Modifications': ['f', 'cl', 'br'], 'Number of Substitutions': [1], 'Permanent':[['pentyl', 8], ['pentyl', 11]]}
 
-    param_dict = {'geometry': 'tpl'}
+    param_dict = {'geometry': 'oct'}
 
     if not os.path.exists(core):
             os.mkdir(core)
 
-    LIGMOD(core, ligand_dict, mod_dict, param_dict, False, 'small')
+    LIGMOD(core, ligand_dict, mod_dict, param_dict, True, 'small')

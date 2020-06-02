@@ -4,20 +4,13 @@ from itertools import combinations_with_replacement
 from itertools import product
 from collections import Counter
 
-"""
-
-    To Do:
-    1 - add flag for too many substitutions and too few total sites - Do in Comp.py
-
-"""
-
-
 def COREMOD(core, core_mod, mod_dict, param_dict, compile_structures, size):
 
     structure_count = 0
 
     numsub = mod_dict['Number of Substitutions']
     mods   = mod_dict['Modifications']
+    perm   = mod_dict['Permanent']
 
     for j in range(len(numsub)):
         numsub[j] = int(numsub[j])
@@ -156,6 +149,8 @@ def COREMOD(core, core_mod, mod_dict, param_dict, compile_structures, size):
                 f.write("-lig ")
                 for j in sub:
                     f.write(j + " ")
+                for j in perm:
+                    f.write(str(j[0]) + " ")
                 f.write("\n")
 
                 f.write("-ligocc ")
@@ -167,6 +162,8 @@ def COREMOD(core, core_mod, mod_dict, param_dict, compile_structures, size):
                 temp = ''
                 for j in ind:
                     temp += (str(j) + ",")
+                for j in perm:
+                    temp += (str(j[1]) + ",")
                 f.write(temp[:-1])
                 f.write("\n")
 
@@ -204,11 +201,12 @@ def COREMOD(core, core_mod, mod_dict, param_dict, compile_structures, size):
 if __name__ == "__main__":
 
     core_dict   = {
-                   'nickelporphyrin1': {'All Hs': [9, 10, 17, 18, 24, 25, 30, 31]},
-                   'nickelporphyrin2': {'Symmetric Hs': [[9, 10], [17, 18], [24, 25]], 'Non-Symmetric Hs': [30, 31]}
+                   'nickelporphyrin': {'All Hs': [9, 10]},
                    }
 
-    mod_dict    = {'Modifications': ['f', 'cl', 'br', 'i'], 'Number of Substitutions': [1]}
+    mod_dict    = {'Modifications': ['f', 'cl', 'br', 'i'], 
+                   'Number of Substitutions': [1], 
+                   'Permanent': [['cl', 30]]}
 
     param_dict = {'geometry': 'sqp'}
 
@@ -217,7 +215,7 @@ if __name__ == "__main__":
         if not os.path.exists(core):
             os.mkdir(core)
 
-        COREMOD(core, core_mod, mod_dict, param_dict)
+        COREMOD(core, core_mod, mod_dict, param_dict, True, 'small' )
 
 
 

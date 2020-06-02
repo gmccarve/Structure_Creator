@@ -63,10 +63,8 @@ def COMP(ligand_dict, core_dict, mod_dict, param_dict):
                 if vv != []:
                     num_core_atoms += len(vv)
 
-    num_atoms = num_core_atoms + num_lig_atoms
-
     for j in mod_dict['Number of Substitutions']:
-        if int(j) > num_atoms:  
+        if int(j) > num_core_atoms and int(j) > num_lig_atoms:  
             print ("\n\n ERROR. Too many substitutions and not enough atoms to modify")
             sys.exit()
 
@@ -104,14 +102,14 @@ def COMP(ligand_dict, core_dict, mod_dict, param_dict):
 if __name__ == '__main__':
 
 
-    ligand_dict = {0: [{'acac': {'Ligand Frequency': '3', 'Symmetric Hs': [], 'Non-Symmetric Hs': [14]}}]}
+    ligand_dict = {0: [{'acac': {'Ligand Frequency': '3', 'Symmetric Hs': [8, 9, 10], 'Non-Symmetric Hs': [14]}}]}
 
     core_dict   = {'la': {},
                    'gd': {},
                    'lu': {}}
 
 
-    mod_dict    = {'Modifications': ['f', 'cl', 'br'], 'Number of Substitutions': [2]}
+    mod_dict    = {'Modifications': ['f', 'cl', 'br'], 'Number of Substitutions': [2], 'Permanent': [['cl', 8]]}
 
     param_dict  = {'geometry': 'oct'}
 

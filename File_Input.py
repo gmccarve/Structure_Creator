@@ -492,8 +492,8 @@ def FILE_INPUT(input_file):
                     count += 1
 
 
-    print ("\n\nInput file read successfully.")
-    print ("Would you like to [compile] or [print] the necessary dictionaries?\n")
+    print ("\n\n Input file read successfully.")
+    print (" Would you like to [compile] or [print] the necessary dictionaries?\n")
     
     choice = Input()
 
@@ -502,31 +502,33 @@ def FILE_INPUT(input_file):
 
     elif choice == 'print':
 
-        print ("________________________")
-        print ("Cores:\n")
-        for k, v in core_dict.items():
-            print (k, v)
+        print ("\n\n")
 
-        print ("________________________")
-        print ("Ligand Environments:\n")
+        print (" ________________________")
+        print (" Cores:\n")
+        for k, v in core_dict.items():
+            print (" ", k, v)
+
+        print (" ________________________")
+        print (" Ligand Environments:\n")
         for k, v in ligand_dict.items():
-            print (k)
+            print (" ", k)
             print ()
             for j in v:
                 for kk, vv in j.items():
-                    print (kk, vv)
+                    print (" ", kk, vv)
                 print ()
             print ()
 
-        print ("________________________")
-        print ("Modifications:\n")
+        print (" ________________________")
+        print (" Modifications:\n")
         for k, v in mod_dict.items():
-            print (k, v)
+            print (" ", k, v)
 
-        print ("________________________")
-        print ("Molsimplify Parameters:\n")
+        print (" ________________________")
+        print (" Molsimplify Parameters:\n")
         for k, v in param_dict.items():
-            print (k, v)
+            print (" ", k, v)
         print ()
 
         return
