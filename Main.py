@@ -7,6 +7,10 @@ import time
 from File_Input import FILE_INPUT
 from Menu import MENU
 
+#TODO add slabs
+#TODO add transition states
+#TODO add static classifier
+
 
 def clear():
     # Clears the terminal screen
@@ -41,11 +45,19 @@ def check_molsimplify():
 if __name__ == "__main__":
 
     if check_molsimplify() == False:
-        print (" molSimplify must be installed to use this program.\
+        print (" MolSimplify must be installed to use this program.\
               \n Please see https://github.com/hjkgrp/molSimplify \
               \n on how to install molSimplify.")
-        time.sleep(15)
-        sys.exit()
+
+        print (" To skip this warning, type [skip], \
+              \n to end the program, type [end]")
+
+        choice = Input()
+
+        if choice == 'skip':
+            pass
+        else:
+            sys.exit()
 
     OS = platform.system()
 
